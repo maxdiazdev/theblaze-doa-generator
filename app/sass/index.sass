@@ -1,0 +1,252 @@
+// COLORS
+$white-light: #F2F3F8
+$white-medium: #EDEFF4
+$white-dark: #E1E1E9
+
+// RANGE HANDLE
+$handle-size: 25px
+$handle-radius: 50%
+$handle-color: $white-dark
+
+// INPUT PLACEHOLDER
+$placeholder-size: 18px
+$placeholder-color: $white-dark
+
+
+// MIXINS
+@mixin bg-checkers
+  background:
+    image: linear-gradient(45deg, $white-light 25%, transparent 25%), linear-gradient(-45deg, $white-light 25%, transparent 25%), linear-gradient(45deg, transparent 75%, $white-light 75%), linear-gradient(-45deg, transparent 75%, $white-light 75%)
+    color: white
+    position: 0 0, 0 15px, 15px -15px, -15px 0px
+    size: 30px 30px
+
+// FONTS
+@font-face
+    font-family: 'tex_gyre_heros'
+    src: url('../fonts/texgyreheros-bold-webfont.woff') format('woff'), url('../fonts/texgyreheros-bold-webfont.ttf') format('truetype'), url('texgyreheros-bold-webfont.eot') format('eot')
+    font-weight: bold
+    font-style: normal
+
+@font-face
+    font-family: 'tex_gyre_heros'
+    src: url('../fonts/texgyreheros-regular-webfont.woff') format('woff'), url('../fonts/texgyreheros-regular-webfont.ttf') format('truetype'), url('../fonts/texgyreheros-regular-webfont.eot') format('eot')
+    font-weight: normal
+    font-style: normal
+
+// RESETS
+body
+  margin: 0
+  background-color: $white-light
+  font-family: "Helvetica Neue", "tex_gyre_heros", Arial, sans-serif
+  font-size: 16px
+
+h1,
+h2
+  margin: 0
+
+button
+  margin: 0
+  overflow: visible
+  -webkit-appearance: button
+  font-family: sans-serif
+  font-size: 100%
+  line-height: 1.15
+
+  &::-moz-focus-inner
+    border-style: none
+    padding: 0
+
+  &::-moz-focusring
+    outline: 1px dotted ButtonText
+
+  &:hover
+    cursor: pointer
+
+fieldset
+  border: none
+  margin-left: 0
+
+input[type="text"]
+  &::-webkit-input-placeholder
+    font-size: $placeholder-size
+    color: $placeholder-color
+
+  &::-moz-placeholder
+  font-size: $placeholder-size
+  color: $placeholder-color
+
+  &:-ms-input-placeholder
+  font-size: $placeholder-size
+  color: $placeholder-color
+
+  &:-moz-placeholder
+  font-size: $placeholder-size
+  color: $placeholder-color
+  opacity: 1
+
+input[type="range"]
+  width: 100%
+  -webkit-appearance: none
+
+  &:focus
+    outline: none
+
+  &::-ms-track
+    background: transparent
+    border-color: transparent
+    color: transparent
+
+  &::-webkit-slider-thumb
+    width: $handle-size
+    height: $handle-size
+    border-radius: $handle-radius
+    background-color: $handle-color
+    margin-top: -8px
+    -webkit-appearance: none
+    cursor: pointer
+
+  &::-moz-range-thumb
+    width: $handle-size
+    height: $handle-size
+    border-radius: $handle-radius
+    background-color: $handle-color
+    cursor: pointer
+
+  &::-ms-thumb
+    width: $handle-size
+    height: $handle-size
+    border-radius: $handle-radius
+    background-color: $handle-color
+    cursor: pointer
+
+  &::-webkit-slider-runnable-track
+    width: 100%
+    height: 8.4px
+    background-color: $handle-color
+    margin-left: -2px
+    cursor: pointer
+
+  &:focus::-webkit-slider-runnable-track
+    background-color: $handle-color
+    cursor: pointer
+
+  &::-moz-range-track
+    width: 100%
+    height: 8.4px
+    background-color: $handle-color
+    cursor: pointer
+
+  &::-ms-track
+    width: 100%
+    height: 8.4px
+    background-color: $handle-color
+    cursor: pointer
+
+  &::-ms-fill-lower
+    background-color: $handle-color
+
+  &:focus::-ms-fill-lower
+    background-color: $handle-color
+
+  &::-ms-fill-upper
+    background-color: $handle-color
+
+  &:focus::-ms-fill-upper
+    background-color: $handle-color
+
+// GENERATOR
+.generator
+  width: 640px
+  margin: 0 auto
+  background-color: white
+
+  *
+    box-sizing: border-box
+
+  &__title
+    font-size: 45px
+    font-weight: 500
+    text-align: center
+    color: $white-medium
+
+  &__caption
+    margin-bottom: 10px
+    font-size: 18px
+    font-weight: 500
+    text-transform: uppercase
+    color: white
+
+  &__button
+    display: inline-block
+    padding: 12px 20px
+    border: none
+    border-radius: 3px
+    background-color: $white-dark
+    font-weight: 500
+    color: white
+
+    &--add-margin
+      margin-top: 18px
+
+  &__header
+    width: 100%
+    padding-top: 35px
+    padding-bottom: 35px
+
+  &__preview
+    width: 100%
+    height: 300px
+    padding: 20px 50px
+    background-color: $white-medium
+
+  &__canvas
+    width: 538px
+    height: 303px
+    border: 5px solid $white-dark
+    border-radius: 3px
+    @include bg-checkers
+
+  &__controls
+    width: 100%
+    margin-top: 75px
+
+  &__fieldset
+    width: 100%
+    padding: 20px 50px
+
+  &__input
+    display: block
+    width: 100%
+    font-size: 18px
+    color: $white-medium
+
+    &--image
+      border: 5px dashed $white-light
+      padding: 12px 15px
+
+    &--range
+      padding-top: 20px
+      padding-bottom: 20px
+      background-color: $white-light
+      overflow: hidden
+
+    &--text
+      padding: 12px 15px
+      border: 5px solid $white-light
+
+  &__directions
+    display: block
+    width: 100%
+    margin-bottom: 15px
+    font-size: 20px
+    font-weight: 500
+    color: $white-medium
+
+  &__footer
+    width: 100%
+    padding-top: 25px
+    padding-bottom: 25px
+    margin-top: 50px
+    background-color: $white-medium
+    text-align: center
