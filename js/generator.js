@@ -193,28 +193,29 @@ var generator = (function () {
   function _addListeners() {
     document.querySelectorAll("input").forEach(function(thisInput) {
       var parent = thisInput.parentElement,
-          button = parent.querySelector(".generator__button");
+          button = parent.querySelector(".generator__button"),
+          inputClass = thisInput.className;
 
       if (button) {
         button.addEventListener("click", function() {
           var inputValue = thisInput.value;
 
-          switch (thisInput.id) {
-            case "jsAddCourtesy":
+          switch (true) {
+            case actions.matchString(inputClass, "js-add-courtesy"):
               if (inputValue) {
                 actions.addCourtesy(inputValue);
               } else {
                 alert("No text added to courtesy field.");
               }
               break;
-            case "jsUploadPortrait":
+            case actions.matchString(inputClass, "js-upload-portrait"):
               thisInput.click();
               thisInput.onchange = function() {
                 actions.readFile(thisInput, actions.renderPortrait);
               };
               break;
             default:
-              console.log("No match found for inputID.");
+              console.log("No match found for inputClass.");
               break;
           }
         });
