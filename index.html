@@ -22,18 +22,19 @@
         <fieldset class="generator__fieldset">
           <label class="generator__directions">Upload a photo to start. Portraits look best!</label>
           <input id="jsUploadPortrait" type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button generator__button--add-margin" type="button">Choose Image</button>
+          <button class="generator__button generator__button--add-margin-top" type="button">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset">
-          <label class="generator__directions">Add a courtesy on the top-left, if needed.</label>
-          <input class="generator__input generator__input--text" id="jsAddCourtesy" type="text" placeholder="Example: John Smith">
-          <button class="generator__button generator__button--add-margin" type="button">Add Courtesy</button>
+          <label class="generator__directions">Add a courtesy to your graphic. It's optional.</label>
+          <input class="generator__input generator__input--text" id="jsAddCourtesy" type="text" placeholder="Type a courtesy here.">
+          <button class="generator__button generator__button--add-margin-top" type="button">Add Courtesy</button>
         </fieldset>
       </section>
       <footer class="generator__footer">
-        <button class="generator__button" type="button" onclick="">Download Results</button>
+        <button class="generator__button" type="button" onclick="generator.downloadCanvas()">Download Results</button>
       </footer>
     </div>
   </body>
+  <script src="js/file-saver.min.js"></script>
   <script src="js/generator.js"></script>
 </html>

@@ -185,7 +185,7 @@ input[type="range"]:focus::-ms-fill-upper {
   color: white;
 }
 
-.generator__button--add-margin {
+.generator__button--add-margin-top {
   margin-top: 18px;
 }
 
@@ -252,6 +252,10 @@ input[type="range"]:focus::-ms-fill-upper {
 .generator__input--text {
   padding: 12px 15px;
   border: 5px solid #F2F3F8;
+}
+
+.generator__input--add-margin-bottom {
+  margin-bottom: 15px;
 }
 
 .generator__directions {
