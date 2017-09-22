@@ -39,9 +39,8 @@ var generator = (function () {
           padding = { top: 14, right: 70, bottom: 35, left: 35 };
 
       if (courtesy.length > 0) {
-        var lastOffsetY = Number(document.getElementById("jsAdjustImageY").value);
         actions.clearCanvas();
-        actions.renderPortrait(lastOffsetY);
+        actions.renderPortrait();
         actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
       }
     },
@@ -63,13 +62,13 @@ var generator = (function () {
 
       switch(true) {
         case actions.matchString(string, "facebook"):
-          socialIcon.src = "img/social/icon-facebook.png";
+          socialIcon.src = "img/icons/icon-facebook.png";
           break;
         case actions.matchString(string, "instagram"):
-          socialIcon.src = "img/social/icon-instagram.png";
+          socialIcon.src = "img/icons/icon-instagram.png";
           break;
         case actions.matchString(string, "twitter"):
-          socialIcon.src = "img/social/icon-twitter.png";
+          socialIcon.src = "img/icons/icon-twitter.png";
           break;
         default:
           socialIcon = false;
@@ -198,11 +197,12 @@ var generator = (function () {
 
       if (button) {
         button.addEventListener("click", function() {
+          var inputValue = thisInput.value;
+
           switch (thisInput.id) {
             case "jsAddCourtesy":
-              var courtesy = thisInput.value;
-              if (courtesy) {
-                actions.addCourtesy(courtesy);
+              if (inputValue) {
+                actions.addCourtesy(inputValue);
               } else {
                 alert("No text added to courtesy field.");
               }
@@ -217,11 +217,6 @@ var generator = (function () {
               console.log("No match found for inputID.");
               break;
           }
-        });
-      } else if (thisInput.id == "jsAdjustImageY") {
-        thisInput.addEventListener("change", function() {
-          var offsetY = Number(thisInput.value);
-          actions.renderPortrait(offsetY);
         });
       }
     });

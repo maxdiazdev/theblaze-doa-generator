@@ -21,6 +21,13 @@ $placeholder-color: $white-dark
     position: 0 0, 0 15px, 15px -15px, -15px 0px
     size: 30px 30px
 
+@mixin bg-cover-image
+  background:
+    image: url("../img/landscape-glenn.jpg")
+    color: transparent
+    position: center center
+    size: cover
+
 // FONTS
 @font-face
     font-family: 'tex_gyre_heros'
@@ -206,6 +213,9 @@ input[type="range"]
     border: 5px solid $white-dark
     border-radius: 3px
     @include bg-checkers
+
+    &--add-background-image
+      @include bg-cover-image
 
   &__controls
     width: 100%

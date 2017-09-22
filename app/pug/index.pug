@@ -18,15 +18,12 @@ html(lang="en")
         canvas.generator__canvas(width="1280" height="720" data-template="portrait")
       section.generator__controls
         fieldset.generator__fieldset
-          label.generator__directions Upload a photo to start. Can be portrait or landscape.
+          label.generator__directions Upload a photo to start. Portraits look best!
           input#jsUploadPortrait(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button.generator__button--add-margin(type="button") Choose Image
         fieldset.generator__fieldset
-          label.generator__directions Drag slider to adjust background image.
-          input#jsAdjustImageY.generator__input.generator__input--range(type="range" min="0.0" max="1.0" step="0.1")
-        fieldset.generator__fieldset
-          label.generator__directions Does your graphic need a source? Add a courtesy.
+          label.generator__directions Add a courtesy on the top-left, if needed.
           input#jsAddCourtesy.generator__input.generator__input--text(type="text" placeholder="Example: John Smith")
           button.generator__button.generator__button--add-margin(type="button") Add Courtesy
       footer.generator__footer
