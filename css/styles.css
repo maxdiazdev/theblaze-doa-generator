@@ -213,6 +213,13 @@ input[type="range"]:focus::-ms-fill-upper {
   background-size: 30px 30px;
 }
 
+.generator__canvas--add-background-image {
+  background-image: url("../img/landscape-glenn.jpg");
+  background-color: transparent;
+  background-position: center center;
+  background-size: cover;
+}
+
 .generator__controls {
   width: 100%;
   margin-top: 75px;
