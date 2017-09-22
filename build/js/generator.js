@@ -191,6 +191,63 @@ var generator = (function () {
   };
 
   function _addListeners() {
+    document.querySelectorAll(".generator__button--add-margin-top").forEach(function(thisButton) {
+      var parent = thisButton.parentElement,
+          input = parent.querySelectorAll("input");
+
+      if (input.length > 1) {
+        thisButton.addEventListener("click", function() {
+          var blankInputs = 0;
+
+          for(i = 0; i < input.length; i++) {
+            if (!input[i].value) {
+              blankInputs++;
+            }
+          }
+
+          if (blankInputs === 0) {
+            actions.clearCanvas();
+
+            input.forEach(function(thisInput) {
+              var thisValue = thisInput.value,
+                  thisFSize = thisInput.dataset.fontSize,
+                  thisFWeight = thisInput.dataset.fontWeight,
+                  thisYPos = thisInput.dataset.yPos;
+
+                actions.drawText(thisValue, thisFSize, thisFWeight, 80, thisYPos);
+            });
+          } else {
+            alert(blankInputs + " text field(s) were left empty. You must fill each of them to submit.");
+          }
+        });
+      } else {
+        thisButton.addEventListener("click", function() {
+          var thisInput = input[0],
+              thisClass = thisInput.className,
+              thisValue = thisInput.value;
+
+          switch (true) {
+            case actions.matchString(thisClass, "js-add-courtesy"):
+              if (thisValue) {
+                actions.addCourtesy(thisValue);
+              } else {
+                alert("No text added to courtesy field.");
+              }
+              break;
+            case actions.matchString(thisClass, "js-upload-portrait"):
+              thisInput.click();
+              thisInput.onchange = function() {
+                actions.readFile(thisInput, actions.renderPortrait);
+              };
+              break;
+            default:
+              console.log("No match found for thisClass.");
+              break;
+          }
+        });
+      }
+    });
+    /*
     document.querySelectorAll("input").forEach(function(thisInput) {
       var parent = thisInput.parentElement,
           button = parent.querySelector(".generator__button"),
@@ -221,6 +278,7 @@ var generator = (function () {
         });
       }
     });
+    */
   }
 
   // Inits
