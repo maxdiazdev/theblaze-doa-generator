@@ -19,12 +19,12 @@ html(lang="en")
       section.generator__controls
         fieldset.generator__fieldset
           label.generator__directions Upload a photo to start. Portraits look best!
-          input#jsUploadPortrait(type="file" accept=".jpg, .jpeg, .png" style="display: none")
+          input.js-upload-portrait(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button.generator__button--add-margin-top(type="button") Choose Image
         fieldset.generator__fieldset
           label.generator__directions Add a courtesy to your graphic. It's optional.
-          input#jsAddCourtesy.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here.")
+          input.js-add-courtesy.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here.")
           button.generator__button.generator__button--add-margin-top(type="button") Add Courtesy
       footer.generator__footer
         button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
