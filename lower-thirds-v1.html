@@ -21,10 +21,15 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset">
           <label class="generator__directions">Does your graphic need a source? Add a courtesy.</label>
-          <input class="js-add-group-text generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the top line of text." data-font-size="40" data-font-weight="400" data-y-pos="575">
-          <input class="js-add-group-text generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the middle line of text." data-font-size="50" data-font-weight="500" data-y-pos="625">
-          <input class="js-add-group-text generator__input generator__input--text" type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-y-pos="670">
+          <input class="js-add-group-text generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the top line of text." data-font-size="40" data-font-weight="400" data-baseline-y="575">
+          <input class="js-add-group-text generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the middle line of text." data-font-size="50" data-font-weight="500" data-baseline-y="625">
+          <input class="js-add-group-text generator__input generator__input--text" type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670">
           <button class="generator__button generator__button--add-margin-top" type="button">Add Text Group</button>
+        </fieldset>
+        <fieldset class="generator__fieldset">
+          <label class="generator__directions">Upload a photo to start. Portraits look best!</label>
+          <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
+          <button class="generator__button generator__button--add-margin-top" type="button">Choose Image</button>
         </fieldset>
       </section>
       <footer class="generator__footer">

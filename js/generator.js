@@ -10,6 +10,7 @@ var generator = (function () {
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
     font: { family:"\"Helvetica Neue\", \"tex_gyre_heros\", Arial, sans-serif" },
+    group: "No group set.", // Store a group of elements for later use
     image: "No image set."
   };
 
@@ -44,12 +45,33 @@ var generator = (function () {
         actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
       }
     },
+    addPhoner: function() {
+      var ratio = settings.image.width / settings.image.height,
+          newHeight = actions.getLowerThirdsHeight(),
+          newWidth = Math.round(newHeight * ratio),
+          startX = 80,
+          startY = Number(settings.group[0].dataset.baselineY - settings.group[0].dataset.fontSize) + 8,
+          marginRight = 35;
+
+      if (newHeight) {
+        actions.clearCanvas();
+        actions.addBottomGradient(1/3);
+        actions.fitImage(settings.image, newWidth, newHeight, startX, startY);
+        console.log("Phoner dimensions are: " + newWidth + ", " + newHeight);
+        startX += newWidth + marginRight;
+        actions.renderLowerThirds(startX);
+      }
+    },
     clearCanvas: function() {
       settings.context.clearRect(0, 0, settings.width, settings.height);
     },
     downloadCanvas: function() {
       canvas.toBlob(function(blob) {
-        saveAs(blob, "Untitled_1280x720.jpg");
+        if (settings.template == "lower-thirds") {
+          saveAs(blob, "Untitled_1280x720.png");
+        } else {
+          saveAs(blob, "Untitled_1280x720.jpg");
+        }
       });
     },
     drawText: function(string, fSize, fWeight, startX, startY) {
@@ -80,7 +102,7 @@ var generator = (function () {
 
         if (socialIcon) {
           socialIcon.onload = function () {
-            context.drawImage(socialIcon, 80, (startY - fSize + 5), fSize, fSize);
+            context.drawImage(socialIcon, startX, (startY - fSize + 5), fSize, fSize);
           };
           context.fillText(string, (startX + 50), startY);
         } else {
@@ -152,6 +174,29 @@ var generator = (function () {
       // Fill image in dest. rectangle
       settings.context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
     },
+    getLowerThirdsHeight: function() {
+      var inputsArray = settings.group,
+          blankInputs = 0,
+          totalHeight = 0;
+
+      inputsArray.forEach(function(input) {
+        var fSize = Number(input.dataset.fontSize),
+            baselineY = Number(input.dataset.baselineY);
+
+        if (input.value) {
+          totalHeight += fSize;
+        } else {
+          blankInputs++;
+        }
+      });
+
+      if (blankInputs === 0) {
+        return totalHeight;
+      } else {
+        alert(blankInputs + " text field(s) were left empty. You must fill each of them to submit.");
+        return false;
+      }
+    },
     matchString: function(search, find) {
       return search.includes(find);
     },
@@ -183,80 +228,44 @@ var generator = (function () {
           image = settings.image;
 
       actions.clearCanvas();
-      context.filter = "grayscale(100%) brightness(50%)"; // Apply filters to background image
+      context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
       actions.fitImage(image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
       actions.fitImage(image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
+    },
+    renderLowerThirds: function(startX) {
+      var inputsArray = settings.group;
+
+      if (!startX) {
+        startX = 80;
+      }
+
+      inputsArray.forEach(function(input) {
+        inputValue = input.value;
+        fSize = input.dataset.fontSize;
+        fWeight = input.dataset.fontWeight;
+        baselineY = input.dataset.baselineY;
+
+        actions.drawText(inputValue, fSize, fWeight, startX, baselineY);
+      });
     }
   };
 
   function _addListeners() {
-    document.querySelectorAll(".generator__button--add-margin-top").forEach(function(thisButton) {
-      var parent = thisButton.parentElement,
-          input = parent.querySelectorAll("input");
+    var fieldButtons = document.querySelectorAll(".generator__button--add-margin-top");
 
-      if (input.length > 1) {
-        thisButton.addEventListener("click", function() {
-          var blankInputs = 0;
+    fieldButtons.forEach(function(button) {
+      var parent = button.parentElement,
+          inputsArray = parent.querySelectorAll("input"),
+          input = inputsArray[0],
+          inputClass = input.className,
+          inputValue = input.value;
 
-          for(i = 0; i < input.length; i++) {
-            if (!input[i].value) {
-              blankInputs++;
-            }
-          }
-
-          if (blankInputs === 0) {
-            actions.clearCanvas();
-
-            input.forEach(function(thisInput) {
-              var thisValue = thisInput.value,
-                  thisFSize = thisInput.dataset.fontSize,
-                  thisFWeight = thisInput.dataset.fontWeight,
-                  thisYPos = thisInput.dataset.yPos;
-
-                actions.drawText(thisValue, thisFSize, thisFWeight, 80, thisYPos);
-            });
-          } else {
-            alert(blankInputs + " text field(s) were left empty. You must fill each of them to submit.");
-          }
-        });
-      } else {
-        thisButton.addEventListener("click", function() {
-          var thisInput = input[0],
-              thisClass = thisInput.className,
-              thisValue = thisInput.value;
-
-          switch (true) {
-            case actions.matchString(thisClass, "js-add-courtesy"):
-              if (thisValue) {
-                actions.addCourtesy(thisValue);
-              } else {
-                alert("No text added to courtesy field.");
-              }
-              break;
-            case actions.matchString(thisClass, "js-upload-portrait"):
-              thisInput.click();
-              thisInput.onchange = function() {
-                actions.readFile(thisInput, actions.renderPortrait);
-              };
-              break;
-            default:
-              console.log("No match found for thisClass.");
-              break;
-          }
-        });
-      }
-    });
-    /*
-    document.querySelectorAll("input").forEach(function(thisInput) {
-      var parent = thisInput.parentElement,
-          button = parent.querySelector(".generator__button"),
-          inputClass = thisInput.className;
-
-      if (button) {
-        button.addEventListener("click", function() {
-          var inputValue = thisInput.value;
-
+      button.addEventListener("click", function() {
+        if (inputsArray.length > 1) {
+          settings.group = inputsArray;
+          actions.renderLowerThirds();
+        } else {
           switch (true) {
             case actions.matchString(inputClass, "js-add-courtesy"):
               if (inputValue) {
@@ -265,24 +274,40 @@ var generator = (function () {
                 alert("No text added to courtesy field.");
               }
               break;
+            case actions.matchString(inputClass, "js-add-courtesy"):
+              if (inputValue) {
+                actions.addCourtesy(inputValue);
+              } else {
+                alert("No text added to courtesy field.");
+              }
+              break;
             case actions.matchString(inputClass, "js-upload-portrait"):
-              thisInput.click();
-              thisInput.onchange = function() {
-                actions.readFile(thisInput, actions.renderPortrait);
+              input.click();
+              input.onchange = function() {
+                actions.readFile(input, actions.renderPortrait);
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-phoner"):
+              input.click();
+              input.onchange = function() {
+                actions.readFile(input, actions.addPhoner);
               };
               break;
             default:
               console.log("No match found for inputClass.");
               break;
           }
-        });
-      }
+        }
+      });
     });
-    */
   }
 
   // Inits
   _addListeners();
+
+  if (settings.template == "lower-thirds") {
+    actions.addBottomGradient(1/3);
+  }
 
   return actions;
 })(canvas);
