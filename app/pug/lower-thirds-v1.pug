@@ -18,16 +18,16 @@ html(lang="en")
         canvas.generator__canvas.generator__canvas--add-background-image(width="1280" height="720" data-template="lower-thirds")
       section.generator__controls
         fieldset.generator__fieldset
-          label.generator__directions Does your graphic need a source? Add a courtesy.
-          input.js-add-group-text.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the top line of text." data-font-size="40" data-font-weight="400" data-baseline-y="575")
-          input.js-add-group-text.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the middle line of text." data-font-size="50" data-font-weight="500" data-baseline-y="625")
-          input.js-add-group-text.generator__input.generator__input--text(type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670")
-          button.generator__button.generator__button--add-margin-top(type="button") Add Text Group
-        fieldset.generator__fieldset
           label.generator__directions Upload a photo to start. Portraits look best!
           input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button.generator__button--add-margin-top(type="button") Choose Image
+        fieldset.generator__fieldset
+          label.generator__directions Does your graphic need a source? Add a courtesy.
+          input.js-add-text-group.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the top line of text." data-font-size="40" data-font-weight="400" data-baseline-y="575")
+          input.js-add-text-group.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the middle line of text." data-font-size="50" data-font-weight="500" data-baseline-y="625")
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670")
+          button.generator__button.generator__button--add-margin-top(type="button") Add Text Group
       footer.generator__footer
         button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
   script(src="js/file-saver.min.js")
