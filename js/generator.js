@@ -211,6 +211,7 @@ var generator = (function () {
       return blankInputs;
     },
     matchString: function(search, find) {
+      search.toLowerCase();
       return search.includes(find);
     },
     readFile: function(input, callback) {
