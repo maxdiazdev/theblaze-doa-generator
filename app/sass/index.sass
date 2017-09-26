@@ -1,7 +1,7 @@
 // COLORS
-$white-light: #F2F3F8
-$white-medium: #EDEFF4
-$white-dark: #E1E1E9
+$white-light: scale-color(#F2F3F8, $lightness: -3%)
+$white-medium: scale-color(#EDEFF4, $lightness: -3%)
+$white-dark: scale-color(#E1E1E9, $lightness: -3%)
 
 // RANGE HANDLE
 $handle-size: 25px
@@ -165,6 +165,10 @@ input[type="range"]
   &:focus::-ms-fill-upper
     background-color: $handle-color
 
+img
+  width: 100%
+  display: block
+
 // GENERATOR
 .generator
   width: 640px
@@ -269,3 +273,14 @@ input[type="range"]
     margin-top: 50px
     background-color: $white-medium
     text-align: center
+
+.grid
+  max-width: 1280px
+  margin: 10px auto
+  display: grid
+  grid-template-columns: 1fr 1fr 1fr
+  grid-column-gap: 10px
+  grid-row-gap: 10px
+
+  &__card
+    width: 100%
