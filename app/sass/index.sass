@@ -70,6 +70,9 @@ button
   &:hover
     cursor: pointer
 
+  &:disabled
+    cursor: initial
+
 fieldset
   border: none
   margin-left: 0
@@ -224,6 +227,9 @@ input[type="range"]
   &__fieldset
     width: 100%
     padding: 20px 50px
+
+    &--disabled
+      opacity: 0.3
 
   &__input
     display: block

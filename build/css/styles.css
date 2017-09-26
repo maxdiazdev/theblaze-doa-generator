@@ -46,6 +46,10 @@ button:hover {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: initial;
+}
+
 fieldset {
   border: none;
   margin-left: 0;
@@ -228,6 +232,10 @@ input[type="range"]:focus::-ms-fill-upper {
 .generator__fieldset {
   width: 100%;
   padding: 20px 50px;
+}
+
+.generator__fieldset--disabled {
+  opacity: 0.3;
 }
 
 .generator__input {
