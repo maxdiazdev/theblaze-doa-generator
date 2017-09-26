@@ -62,7 +62,7 @@ var generator = (function () {
           newHeight = actions.getLowerThirdsHeight(),
           newWidth = Math.round(newHeight * ratio),
           startX = 80,
-          startY = Number(settings.text[0].dataset.baselineY - settings.text[0].dataset.fontSize) + 8;
+          startY = Number(settings.text[0].dataset.baselineY - 40); // Minus the smallest font size?
 
       actions.clearCanvas();
       // actions.addBottomGradient(1/3);
@@ -120,9 +120,9 @@ var generator = (function () {
 
         if (socialIcon) {
           socialIcon.onload = function () {
-            context.drawImage(socialIcon, startX, (startY - fSize + 5), fSize, fSize);
+            context.drawImage(socialIcon, startX, (startY - fSize + 9), (fSize - 9), (fSize - 9));
           };
-          context.fillText(string, (startX + 50), startY);
+          context.fillText(string, (startX + 42), startY);
         } else {
           context.fillText(string, startX, startY);
         }
@@ -272,12 +272,11 @@ var generator = (function () {
     renderLowerThirds: function() {
       var inputsArray = settings.text,
           blankInputs = actions.getLowerThirdsBlanks(),
-          // startX = 80,
+          startX = 80,
           marginRight = 35,
-          startX = 80 + settings.image.width + marginRight,
           image = settings.image;
 
-      // if (settings.image != "No image set.") startX += settings.image.width + marginRight;
+      if (settings.image != "No image set.") startX += settings.image.width + marginRight;
 
       if (blankInputs > 1) {
         alert(blankInputs + " text fields are empty. Please fill them out before submitting.");
@@ -339,6 +338,10 @@ var generator = (function () {
             input.onchange = function() {
               actions.readFile(input, actions.addPhoner);
             };
+            break;
+          case actions.matchString(inputClass, "js-add-text-single"):
+            actions.clearCanvas();
+            actions.drawText(input.value, input.dataset.fontSize, input.dataset.fontWeight, 80, input.dataset.baselineY);
             break;
           case actions.matchString(inputClass, "js-add-text-group"):
             actions.renderLowerThirds();
