@@ -11,7 +11,7 @@ var generator = (function () {
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
     font: { family:"\"Helvetica Neue\", \"tex_gyre_heros\", Arial, sans-serif" },
-    group: "No group set.", // Store a group of elements for later use
+    text: "No text set.",
     image: "No image set."
   };
 
@@ -29,7 +29,7 @@ var generator = (function () {
           endY = height - height * ratio,
           gradient = context.createLinearGradient(startX, startY, endX, endY);
 
-      gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
+      gradient.addColorStop(0, "rgba(0, 0, 0, 0.8)");
       gradient.addColorStop(1, "rgba(0, 0, 0 ,0)");
       context.fillStyle = gradient;
       context.fillRect(startX, endY, width, height);
@@ -43,14 +43,18 @@ var generator = (function () {
           rectOpacity = 0.5,
           padding = { top: 14, right: 70, bottom: 35, left: 35 };
 
-      console.log("Courtesy is: " + courtesy);
-
       if (courtesy.length > 0) {
-        if (settings.image != "No image set.") {
+        if (settings.image == "No image set.") {
+          alert("Courtesy field is empty.");
+        } else if (settings.text == courtesy) {
+          alert("This courtesy was entered twice.");
+        } else {
+          settings.text = courtesy;
           actions.clearCanvas();
           actions.restoreState(); // Restores initial portrait without a courtesy
+          actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
+          console.log("Courtesy is: " + courtesy);
         }
-        actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
       }
     },
     addPhoner: function() {
@@ -58,18 +62,19 @@ var generator = (function () {
           newHeight = actions.getLowerThirdsHeight(),
           newWidth = Math.round(newHeight * ratio),
           startX = 80,
-          startY = Number(settings.group[0].dataset.baselineY - settings.group[0].dataset.fontSize) + 8;
+          startY = Number(settings.text[0].dataset.baselineY - settings.text[0].dataset.fontSize) + 8;
 
       actions.clearCanvas();
-      actions.addBottomGradient(1/3);
+      // actions.addBottomGradient(1/3);
       actions.fitImage(settings.image, newWidth, newHeight, startX, startY);
       settings.image.width = newWidth;
       settings.image.height = newHeight;
-      actions.saveState();
+      settings.image.startY = startY;
       console.log("Phoner dimensions are: " + newWidth + ", " + newHeight);
     },
     clearCanvas: function() {
       settings.context.clearRect(0, 0, settings.width, settings.height);
+      settings.context.beginPath(); // Essential to clear rectangles, images, etc.
     },
     clearInputs: function() {
       var allInputs = document.querySelectorAll("input");
@@ -145,6 +150,20 @@ var generator = (function () {
       context.fillStyle = 'white';
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
+    enableInputs: function() {
+      var disabledField = document.querySelector(".generator__fieldset--disabled"),
+          children = "";
+
+      if (disabledField) {
+        children = disabledField.children;
+        disabledField.classList.remove("generator__fieldset--disabled");
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") {
+            children[i].disabled = false;
+          }
+        }
+      }
+    },
     fitImage: function(image, width, height, startX, startY, offsetX, offsetY) {
       // Default offset is center
       offsetX = typeof offsetX === "number" ? offsetX : 0.5;
@@ -186,7 +205,7 @@ var generator = (function () {
       settings.context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
     },
     getLowerThirdsHeight: function() {
-      var inputsArray = settings.group,
+      var inputsArray = settings.text,
           totalHeight = 0;
 
       inputsArray.forEach(function(input) {
@@ -199,7 +218,7 @@ var generator = (function () {
       return totalHeight;
     },
     getLowerThirdsBlanks: function() {
-      var inputsArray = settings.group,
+      var inputsArray = settings.text,
           blankInputs = 0;
 
       inputsArray.forEach(function(input) {
@@ -228,6 +247,7 @@ var generator = (function () {
         };
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
+        actions.enableInputs();
         actions.clearInputs();
         console.log("User image uploaded successfully.");
       }
@@ -250,25 +270,26 @@ var generator = (function () {
       actions.saveState();
     },
     renderLowerThirds: function() {
-      var inputsArray = settings.group,
+      var inputsArray = settings.text,
           blankInputs = actions.getLowerThirdsBlanks(),
-          startX = 80,
-          marginRight = 35;
+          // startX = 80,
+          marginRight = 35,
+          startX = 80 + settings.image.width + marginRight,
+          image = settings.image;
 
-      if (settings.image != "No image set.") startX += settings.image.width + marginRight;
+      // if (settings.image != "No image set.") startX += settings.image.width + marginRight;
 
       if (blankInputs > 1) {
         alert(blankInputs + " text fields are empty. Please fill them out before submitting.");
       } else if (blankInputs === 1) {
         alert(blankInputs + " text field is empty. Please fill it out before submitting.");
       } else {
-        if (settings.image == "No image set.") {
-          actions.clearCanvas();
-          actions.addBottomGradient(1/3);
-        } else {
-          actions.clearCanvas();
-          actions.restoreState();
+        actions.clearCanvas();
+
+        if (image != "No image set.") {
+          settings.context.drawImage(image, 80, image.startY, image.width, image.height);
         }
+
         inputsArray.forEach(function(input) {
           inputValue = input.value;
           fSize = input.dataset.fontSize;
@@ -298,7 +319,7 @@ var generator = (function () {
           inputClass = input.className;
 
       if (inputsArray.length > 1) {
-        settings.group = inputsArray;
+        settings.text = inputsArray;
       }
 
       button.addEventListener("click", function() {
@@ -334,7 +355,7 @@ var generator = (function () {
   _addListeners();
 
   if (settings.template == "lower-thirds") {
-    actions.addBottomGradient(1/3);
+    // actions.addBottomGradient(1/3);
   }
 
   return actions;
