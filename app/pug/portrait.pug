@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    title TheBlaze – Day-of-Air Graphics Generator
+    meta(name="description", content="A client-side application for TV producers that generates screen graphics.")
+    meta(name="author", content="Max Giron")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="css/styles.css")
+    link(rel="icon", type="image/png", href="images/favicon.png")
+      
+  body
+    .generator
+      header.generator__header
+        h1.generator__title Create your graphic
+      section.generator__preview
+        h2.generator__caption Preview
+        canvas.generator__canvas(width="1280" height="720" data-template="portrait")
+      section.generator__controls
+        fieldset.generator__fieldset
+          label.generator__directions Upload a photo to start. Portraits look best!
+          input.js-upload-portrait(type="file" accept=".jpg, .jpeg, .png" style="display: none")
+          span.generator__input.generator__input--image No file uploaded yet.
+          button.generator__button.generator__button--add-margin-top(type="button") Choose Image
+        fieldset.generator__fieldset.generator__fieldset--disabled
+          label.generator__directions Add a courtesy to your graphic. It's optional.
+          input.js-add-courtesy.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here." disabled)
+          button.generator__button.generator__button--add-margin-top(type="button" disabled) Add Courtesy
+      footer.generator__footer
+        button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
+  script(src="js/file-saver.min.js")
+  script(src="js/generator.js")

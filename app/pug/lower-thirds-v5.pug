@@ -1,0 +1,27 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    title TheBlaze – Day-of-Air Graphics Generator
+    meta(name="description", content="A client-side application for TV producers that generates screen graphics.")
+    meta(name="author", content="Max Giron")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="css/styles.css")
+    link(rel="icon", type="image/png", href="images/favicon.png")
+      
+  body
+    .generator
+      header.generator__header
+        h1.generator__title Create your graphic
+      section.generator__preview
+        h2.generator__caption Preview
+        canvas.generator__canvas.generator__canvas--add-background-image(width="1280" height="720" data-template="lower-thirds")
+      section.generator__controls
+        fieldset.generator__fieldset
+          input.js-add-text-group.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the middle line of text." data-font-size="50" data-font-weight="500" data-baseline-y="625")
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670")
+          button.generator__button.generator__button--add-margin-top(type="button") Add Text Group
+      footer.generator__footer
+        button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
+  script(src="js/file-saver.min.js")
+  script(src="js/generator.js")
