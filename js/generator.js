@@ -65,7 +65,7 @@ var generator = (function () {
           startY = Number(settings.text[0].dataset.baselineY - 40); // Minus the smallest font size?
 
       actions.clearCanvas();
-      // actions.addBottomGradient(1/3);
+      actions.addBottomGradient(1/3);
       actions.fitImage(settings.image, newWidth, newHeight, startX, startY);
       settings.image.width = newWidth;
       settings.image.height = newHeight;
@@ -284,6 +284,7 @@ var generator = (function () {
         alert(blankInputs + " text field is empty. Please fill it out before submitting.");
       } else {
         actions.clearCanvas();
+        actions.addBottomGradient(1/3);
 
         if (image != "No image set.") {
           settings.context.drawImage(image, 80, image.startY, image.width, image.height);
@@ -341,6 +342,9 @@ var generator = (function () {
             break;
           case actions.matchString(inputClass, "js-add-text-single"):
             actions.clearCanvas();
+            if (settings.template == "lower-thirds") {
+              actions.addBottomGradient(1/3);
+            }
             actions.drawText(input.value, input.dataset.fontSize, input.dataset.fontWeight, 80, input.dataset.baselineY);
             break;
           case actions.matchString(inputClass, "js-add-text-group"):
@@ -358,7 +362,7 @@ var generator = (function () {
   _addListeners();
 
   if (settings.template == "lower-thirds") {
-    // actions.addBottomGradient(1/3);
+    actions.addBottomGradient(1/3);
   }
 
   return actions;
