@@ -45,32 +45,10 @@ var generator = (function () {
           padding = { top: 14, right: 70, bottom: 35, left: 35 };
 
       if (courtesy.length > 0) {
-        if (content.text == courtesy) {
-          alert("This courtesy was entered twice");
-        } else {
-          content.text = courtesy;
-          actions.clearCanvas();
-          actions.renderPortrait();
-          actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
-        }
+        actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
       } else {
         alert("Courtesy field is empty. Please enter text before submitting.");
       }
-
-      /*
-      if (courtesy.length > 0) {
-        if (content.image == "No image set.") {
-          alert("Courtesy field is empty.");
-        } else if (content.text == courtesy) {
-          alert("This courtesy was entered twice.");
-        } else {
-          content.text = courtesy;
-          actions.clearCanvas();
-          actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
-          console.log("Courtesy is: " + courtesy);
-        }
-      }
-      */
     },
     clearCanvas: function() {
       settings.context.clearRect(0, 0, settings.width, settings.height);
@@ -138,8 +116,8 @@ var generator = (function () {
       font.weight = fWeight;
 
       context.font = font.weight + " " + font.size + "px " + font.family; // Set font properly
-      // context.textBaseline = "top"; // Draw text from top - makes life easier at the moment
-      context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
+      context.textBaseline = "top"; // Draw text from top - makes life easier at the moment
+      // context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
       context.fillStyle = rectColor;
 
       // Get width and height of rectangle using text size
@@ -234,7 +212,7 @@ var generator = (function () {
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
         actions.enableInputs();
-        if (settings.template == "portrait") actions.clearInputs();
+        if (actions.matchString(settings.template, "fullscreen")) actions.clearInputs();
         console.log("User image uploaded successfully.");
       }
 
@@ -253,6 +231,9 @@ var generator = (function () {
       actions.fitImage(image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
       actions.fitImage(image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
+    },
+    renderLandscape: function() {
+      actions.fitImage(content.image, 1280, 720, 0, 0);
     },
     renderLowerThirds: function() {
       var inputsArray = document.querySelectorAll(".js-add-text-group"),
@@ -321,7 +302,20 @@ var generator = (function () {
 
         switch (true) {
           case actions.matchString(inputClass, "js-add-courtesy"):
+            if (settings.template == "portrait-fullscreen") {
+              actions.renderPortrait();
+            } else if (settings.template == "landscape-fullscreen") {
+              actions.renderLandscape();
+            } else {
+              actions.clearCanvas();
+            }
             actions.addCourtesy(inputValue);
+            break;
+          case actions.matchString(inputClass, "js-upload-landscape"):
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderLandscape);
+            };
             break;
           case actions.matchString(inputClass, "js-upload-portrait"):
             fieldInput.click();
