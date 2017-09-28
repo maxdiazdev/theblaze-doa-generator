@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>TheBlaze – Day-of-Air Graphics Generator</title>
+    <meta name="description" content="A client-side application for TV producers that generates screen graphics.">
+    <meta name="author" content="Max Giron">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+  </head>
+  <body>
+    <div class="generator">
+      <header class="generator__header">
+        <h1 class="generator__title">Create your graphic</h1>
+      </header>
+      <section class="generator__preview">
+        <h2 class="generator__caption">Preview</h2>
+        <canvas class="generator__canvas" width="1280" height="720" data-template="article-headline"></canvas>
+      </section>
+      <section class="generator__controls">
+        <fieldset class="generator__fieldset">
+          <label class="generator__directions">Upload a photo to start. Landscapes look best!</label>
+          <input class="js-upload-article" type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
+          <button class="generator__button" type="button">Choose Image</button>
+        </fieldset>
+      </section>
+      <footer class="generator__footer">
+        <button class="generator__button" type="button" onclick="generator.downloadCanvas()">Download Results</button>
+      </footer>
+    </div>
+  </body>
+  <script src="js/file-saver.min.js"></script>
+  <script src="js/generator.js"></script>
+</html>
