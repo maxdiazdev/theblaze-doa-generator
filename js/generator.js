@@ -50,6 +50,47 @@ var generator = (function () {
         alert("Courtesy field is empty. Please enter text before submitting.");
       }
     },
+    addRadialGradient: function() {
+      // http://rectangleworld.com/blog/archives/169
+      var canvas = document.createElement("canvas"),
+          context = canvas.getContext("2d"),
+          rectWidth = settings.width,
+          rectHeight = settings.height,
+          rx = rectWidth,
+        	ry = rectHeight,
+        	cx = rectWidth/2,
+        	cy = rectHeight/2,
+        	scaleX = 0,
+        	scaleY = 0,
+        	invScaleX = 0,
+        	invScaleY = 0,
+        	gradient = 0;
+
+      canvas.width = settings.width;
+      canvas.height = settings.height;
+
+      if (rx >= ry) {
+        scaleX = 1;
+        invScaleX = 1;
+        scaleY = ry/rx;
+        invScaleY = rx/ry;
+        gradient = context.createRadialGradient(cx, cy*invScaleY, 0, cx, cy*invScaleY, rx);
+      } else {
+    		scaleY = 1;
+    		invScaleY = 1;
+    		scaleX = rx/ry;
+    		invScaleX = ry/rx;
+    		gradient = context.createRadialGradient(cx*invScaleX, cy, 0, cx*invScaleX, cy, ry);
+    	}
+
+      context.fillStyle = gradient;
+    	gradient.addColorStop(0.35,"rgba(0, 0, 0 ,0)");
+    	gradient.addColorStop(1,"rgba(0, 0, 0, 0.8)");
+      context.setTransform(1,0,0,scaleY,0,0);
+      context.fillRect(0,0,rectWidth*invScaleX,rectHeight*invScaleY);
+      settings.context.drawImage(canvas, 0, 0);
+
+    },
     clearCanvas: function() {
       settings.context.clearRect(0, 0, settings.width, settings.height);
       settings.context.beginPath(); // Essential to clear rectangles, images, etc.
@@ -145,7 +186,7 @@ var generator = (function () {
         }
       }
     },
-    fitImage: function(image, width, height, startX, startY, offsetX, offsetY) {
+    fitImage: function(context, image, width, height, startX, startY, offsetX, offsetY) {
       // Default offset is center
       offsetX = typeof offsetX === "number" ? offsetX : 0.5;
       offsetY = typeof offsetY === "number" ? offsetY : 0.5;
@@ -183,7 +224,7 @@ var generator = (function () {
       if (containerHeight > imageHeight) containerHeight = imageHeight;
 
       // Fill image in dest. rectangle
-      settings.context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
+      context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
     },
     getPhonerSize: function(newHeight) {
       var ratio = content.image.width / content.image.height,
@@ -228,12 +269,12 @@ var generator = (function () {
 
       actions.clearCanvas();
       context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
-      actions.fitImage(image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
+      actions.fitImage(context, image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
-      actions.fitImage(image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
+      actions.fitImage(context, image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
     },
     renderLandscape: function() {
-      actions.fitImage(content.image, 1280, 720, 0, 0);
+      actions.fitImage(settings.context, content.image, settings.width, settings.height, 0, 0);
     },
     renderLowerThirds: function() {
       var inputsArray = document.querySelectorAll(".js-add-text-group"),
@@ -272,20 +313,26 @@ var generator = (function () {
         actions.enableInputs();
       }
     },
-    textGroupProps: function() {
-      var inputsArray = document.querySelectorAll(".js-add-text-group"),
-          properties = {
-            blankInputs: 0,
-            totalHeight: 0
-          };
+    renderArticleHeadline: function() {
+      actions.clearCanvas();
+      settings.context.fillStyle = "white";
+      settings.context.fillRect(0, 0, settings.width, settings.height);
+      actions.rotateArticle(-5);
+      actions.addRadialGradient();
+    },
+    rotateArticle: function(degrees) {
+      var canvas = document.createElement("canvas"),
+          context = canvas.getContext("2d");
 
-      inputsArray.forEach(function(input) {
-        var fSize = Number(input.dataset.fontSize);
-        if (!input.value) properties.blankInputs++;
-        properties.totalHeight += fSize;
-      });
+      canvas.width = settings.width;
+      canvas.height = settings.height;
 
-      return properties;
+      context.save(); // Save the unrotated context of the canvas so we can restore it later
+      context.rotate(degrees*Math.PI/180);
+      context.translate(-30, 50);
+      actions.fitImage(context, content.image, settings.width, settings.height, 0, 0);
+      settings.context.drawImage(canvas, 0, 0);
+      context.restore(); // We’re done with the rotating so restore the unrotated context
     }
   };
 
@@ -311,16 +358,19 @@ var generator = (function () {
             }
             actions.addCourtesy(inputValue);
             break;
+          case actions.matchString(inputClass, "js-add-text-group"):
+            actions.renderLowerThirds();
+            break;
+          case actions.matchString(inputClass, "js-upload-article"):
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderArticleHeadline);
+            };
+            break;
           case actions.matchString(inputClass, "js-upload-landscape"):
             fieldInput.click();
             fieldInput.onchange = function() {
               actions.readFile(fieldInput, actions.renderLandscape);
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-portrait"):
-            fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderPortrait);
             };
             break;
           case actions.matchString(inputClass, "js-upload-phoner"):
@@ -329,8 +379,11 @@ var generator = (function () {
               actions.readFile(fieldInput, actions.renderLowerThirds);
             };
             break;
-          case actions.matchString(inputClass, "js-add-text-group"):
-            actions.renderLowerThirds();
+          case actions.matchString(inputClass, "js-upload-portrait"):
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderPortrait);
+            };
             break;
           default:
             console.log("No match found for inputClass.");
@@ -372,6 +425,8 @@ var generator = (function () {
 
   if (settings.template == "lower-thirds") {
     actions.addBottomGradient(1/3);
+  } else if (settings.template == "article-headline") {
+    actions.addRadialGradient();
   }
 
   return actions;
