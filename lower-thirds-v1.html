@@ -20,16 +20,24 @@
       </section>
       <section class="generator__controls">
         <fieldset class="generator__fieldset">
-          <label class="generator__directions">Upload a photo to start. Portraits look best!</label>
-          <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button generator__button--add-margin-top" type="button">Choose Image</button>
+          <label class="generator__directions">Drag and re-order, or remove text as needed.</label>
+          <div id="jsSortable">
+            <div class="js-sortable-item"><span class="generator__label">Small Text</span>
+              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-remove"></span>
+            </div>
+            <div class="js-sortable-item"><span class="generator__label">Large Text</span>
+              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500"><span class="js-sortable-remove"></span>
+            </div>
+            <div class="js-sortable-item"><span class="generator__label">Small Text</span>
+              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-remove"></span>
+            </div>
+          </div>
+          <button class="generator__button" type="button">Add Text Group</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled">
-          <label class="generator__directions">Does your graphic need a source? Add a courtesy.</label>
-          <input class="js-add-text-group generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the top line of text." data-font-size="50" data-font-weight="500" data-baseline-y="575" disabled>
-          <input class="js-add-text-group generator__input generator__input--text generator__input--add-margin-bottom" type="text" placeholder="Type in the middle line of text." data-font-size="40" data-font-weight="400" data-baseline-y="623" disabled>
-          <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670" disabled>
-          <button class="generator__button generator__button--add-margin-top" type="button" disabled>Add Text Group</button>
+          <label class="generator__directions">Upload a portrait or landscape photo as the phoner.</label>
+          <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;" disabled><span class="generator__input generator__input--image">No file uploaded yet.</span>
+          <button class="generator__button" type="button" disabled>Choose Image</button>
         </fieldset>
       </section>
       <footer class="generator__footer">
@@ -38,5 +46,6 @@
     </div>
   </body>
   <script src="js/file-saver.min.js"></script>
+  <script src="js/Sortable.min.js"></script>
   <script src="js/generator.js"></script>
 </html>

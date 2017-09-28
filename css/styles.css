@@ -55,19 +55,25 @@ fieldset {
   margin-left: 0;
 }
 
-input[type="text"] {
-  font-size: 18px;
-  color: #d9d9e3;
-  font-size: 18px;
-  color: #d9d9e3;
-  font-size: 18px;
-  color: #d9d9e3;
-  opacity: 1;
-}
-
 input[type="text"]::-webkit-input-placeholder {
   font-size: 18px;
   color: #d9d9e3;
+}
+
+input[type="text"]::-moz-placeholder {
+  font-size: 18px;
+  color: #d9d9e3;
+}
+
+input[type="text"]:-ms-input-placeholder {
+  font-size: 18px;
+  color: #d9d9e3;
+}
+
+input[type="text"]:-moz-placeholder {
+  font-size: 18px;
+  color: #d9d9e3;
+  opacity: 1;
 }
 
 input[type="range"] {
@@ -194,10 +200,6 @@ img {
   color: white;
 }
 
-.generator__button--add-margin-top {
-  margin-top: 18px;
-}
-
 .generator__header {
   width: 100%;
   padding-top: 35px;
@@ -246,6 +248,7 @@ img {
 .generator__input {
   display: block;
   width: 100%;
+  margin-bottom: 15px;
   font-size: 18px;
   color: #e4e7ef;
 }
@@ -267,8 +270,13 @@ img {
   border: 5px solid #e8eaf3;
 }
 
-.generator__input--add-margin-bottom {
-  margin-bottom: 15px;
+.generator__label {
+  padding: 5px 10px;
+  background-color: #e8eaf3;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: white;
 }
 
 .generator__directions {
@@ -302,4 +310,27 @@ img {
 
 .grid__card {
   width: 100%;
+}
+
+.js-sortable-item {
+  position: relative;
+}
+
+.js-sortable-remove {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  top: 30px;
+  right: 25px;
+  cursor: pointer;
+  background-image: url("../img/icons/icon-close.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.js-sortable-ghost > * {
+  color: #d9d9e3;
+  border-color: #d9d9e3;
+  background-color: #d9d9e3;
 }
