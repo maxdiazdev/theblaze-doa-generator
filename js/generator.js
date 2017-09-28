@@ -261,6 +261,13 @@ var generator = (function () {
         callback();
       }, 200);
     },
+    renderArticleHeadline: function() {
+      actions.clearCanvas();
+      settings.context.fillStyle = "white";
+      settings.context.fillRect(0, 0, settings.width, settings.height);
+      actions.rotateArticle(-5);
+      actions.addRadialGradient();
+    },
     renderPortrait: function(offsetY) {
       var width = settings.width,
           height = settings.height,
@@ -313,12 +320,11 @@ var generator = (function () {
         actions.enableInputs();
       }
     },
-    renderArticleHeadline: function() {
-      actions.clearCanvas();
-      settings.context.fillStyle = "white";
-      settings.context.fillRect(0, 0, settings.width, settings.height);
-      actions.rotateArticle(-5);
-      actions.addRadialGradient();
+    renderSideLeft: function() {
+      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0);
+    },
+    renderSideRight: function() {
+      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, settings.width / 2, 0);
     },
     rotateArticle: function(degrees) {
       var canvas = document.createElement("canvas"),
@@ -383,6 +389,18 @@ var generator = (function () {
             fieldInput.click();
             fieldInput.onchange = function() {
               actions.readFile(fieldInput, actions.renderPortrait);
+            };
+            break;
+          case actions.matchString(inputClass, "js-upload-side-left"):
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderSideLeft);
+            };
+            break;
+          case actions.matchString(inputClass, "js-upload-side-right"):
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderSideRight);
             };
             break;
           default:
