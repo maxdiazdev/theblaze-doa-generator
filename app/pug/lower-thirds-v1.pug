@@ -18,17 +18,28 @@ html(lang="en")
         canvas.generator__canvas.generator__canvas--add-background-image(width="1280" height="720" data-template="lower-thirds")
       section.generator__controls
         fieldset.generator__fieldset
-          label.generator__directions Upload a photo to start. Portraits look best!
-          input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none")
-          span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button.generator__button--add-margin-top(type="button") Choose Image
+          label.generator__directions Drag and re-order, or remove text as needed.
+          #jsSortable
+            .js-sortable-item
+              span.generator__label Small Text
+              input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
+              span.js-sortable-remove
+            .js-sortable-item
+              span.generator__label Large Text
+              input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500")
+              span.js-sortable-remove
+            .js-sortable-item
+              span.generator__label Small Text
+              input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
+              span.js-sortable-remove
+          button.generator__button(type="button") Add Text Group
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Does your graphic need a source? Add a courtesy.
-          input.js-add-text-group.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the top line of text." data-font-size="50" data-font-weight="500" data-baseline-y="575" disabled)
-          input.js-add-text-group.generator__input.generator__input--text.generator__input--add-margin-bottom(type="text" placeholder="Type in the middle line of text." data-font-size="40" data-font-weight="400" data-baseline-y="623" disabled)
-          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type in the bottom line of text." data-font-size="40" data-font-weight="400" data-baseline-y="670" disabled)
-          button.generator__button.generator__button--add-margin-top(type="button" disabled) Add Text Group
+          label.generator__directions Upload a portrait or landscape photo as the phoner.
+          input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none" disabled)
+          span.generator__input.generator__input--image No file uploaded yet.
+          button.generator__button(type="button" disabled) Choose Image
       footer.generator__footer
         button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
   script(src="js/file-saver.min.js")
+  script(src="js/Sortable.min.js")
   script(src="js/generator.js")

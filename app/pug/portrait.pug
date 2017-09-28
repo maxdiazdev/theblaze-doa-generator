@@ -21,11 +21,11 @@ html(lang="en")
           label.generator__directions Upload a photo to start. Portraits look best!
           input.js-upload-portrait(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button.generator__button--add-margin-top(type="button") Choose Image
+          button.generator__button(type="button") Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
           label.generator__directions Add a courtesy to your graphic. It's optional.
           input.js-add-courtesy.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here." disabled)
-          button.generator__button.generator__button--add-margin-top(type="button" disabled) Add Courtesy
+          button.generator__button(type="button" disabled) Add Courtesy
       footer.generator__footer
         button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
   script(src="js/file-saver.min.js")

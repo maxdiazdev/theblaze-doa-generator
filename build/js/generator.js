@@ -3,7 +3,6 @@ var canvas = document.querySelector(".generator__canvas");
 
 // Begin generator module
 var generator = (function () {
-  var canvasCopy = document.createElement("canvas"); // Used to save canvas edits throughout app
 
   var settings = {
     width: canvas.width,
@@ -15,8 +14,10 @@ var generator = (function () {
     image: "No image set."
   };
 
-  canvasCopy.width = canvas.width;
-  canvasCopy.height = canvas.height;
+  var content = {
+    text: "No text set.",
+    image: "No image set.",
+  };
 
   var actions = {
     addBottomGradient: function(ratio) {
@@ -44,33 +45,32 @@ var generator = (function () {
           padding = { top: 14, right: 70, bottom: 35, left: 35 };
 
       if (courtesy.length > 0) {
-        if (settings.image == "No image set.") {
+        if (content.text == courtesy) {
+          alert("This courtesy was entered twice");
+        } else {
+          content.text = courtesy;
+          actions.clearCanvas();
+          actions.renderPortrait();
+          actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
+        }
+      } else {
+        alert("Courtesy field is empty. Please enter text before submitting.");
+      }
+
+      /*
+      if (courtesy.length > 0) {
+        if (content.image == "No image set.") {
           alert("Courtesy field is empty.");
-        } else if (settings.text == courtesy) {
+        } else if (content.text == courtesy) {
           alert("This courtesy was entered twice.");
         } else {
-          settings.text = courtesy;
+          content.text = courtesy;
           actions.clearCanvas();
-          actions.restoreState(); // Restores initial portrait without a courtesy
           actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
           console.log("Courtesy is: " + courtesy);
         }
       }
-    },
-    addPhoner: function() {
-      var ratio = settings.image.width / settings.image.height,
-          newHeight = actions.getLowerThirdsHeight(),
-          newWidth = Math.round(newHeight * ratio),
-          startX = 80,
-          startY = Number(settings.text[0].dataset.baselineY - 40); // Minus the smallest font size?
-
-      actions.clearCanvas();
-      actions.addBottomGradient(1/3);
-      actions.fitImage(settings.image, newWidth, newHeight, startX, startY);
-      settings.image.width = newWidth;
-      settings.image.height = newHeight;
-      settings.image.startY = startY;
-      console.log("Phoner dimensions are: " + newWidth + ", " + newHeight);
+      */
     },
     clearCanvas: function() {
       settings.context.clearRect(0, 0, settings.width, settings.height);
@@ -95,7 +95,8 @@ var generator = (function () {
     drawText: function(string, fSize, fWeight, startX, startY) {
       var font = settings.font,
           context = settings.context,
-          socialIcon = new Image();
+          socialIcon = new Image(),
+          marginOfErr = 9;
 
       font.size = fSize;
       font.weight = fWeight;
@@ -116,11 +117,12 @@ var generator = (function () {
 
       if (string.length > 0) {
         context.font = font.weight + " " + font.size + "px " + font.family;
-        context.fillStyle = 'white';
+        context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
+        context.fillStyle = "white";
 
         if (socialIcon) {
           socialIcon.onload = function () {
-            context.drawImage(socialIcon, startX, (startY - fSize + 9), (fSize - 9), (fSize - 9));
+            context.drawImage(socialIcon, startX, startY, (fSize - marginOfErr), (fSize - marginOfErr));
           };
           context.fillText(string, (startX + 42), startY);
         } else {
@@ -136,7 +138,8 @@ var generator = (function () {
       font.weight = fWeight;
 
       context.font = font.weight + " " + font.size + "px " + font.family; // Set font properly
-      context.textBaseline = 'top'; // Draw text from top - makes life easier at the moment
+      // context.textBaseline = "top"; // Draw text from top - makes life easier at the moment
+      context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
       context.fillStyle = rectColor;
 
       // Get width and height of rectangle using text size
@@ -147,7 +150,7 @@ var generator = (function () {
 
       context.fillRect(startX, startY, (rectWidth + padding.right), (rectHeight + padding.bottom));
       context.globalAlpha = 1.0; // Reset opacity for future drawings
-      context.fillStyle = 'white';
+      context.fillStyle = "white";
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
     enableInputs: function() {
@@ -204,30 +207,13 @@ var generator = (function () {
       // Fill image in dest. rectangle
       settings.context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
     },
-    getLowerThirdsHeight: function() {
-      var inputsArray = settings.text,
-          totalHeight = 0;
+    getPhonerSize: function(newHeight) {
+      var ratio = content.image.width / content.image.height,
+          newWidth = Math.round(newHeight * ratio);
 
-      inputsArray.forEach(function(input) {
-        var fSize = Number(input.dataset.fontSize),
-            baselineY = Number(input.dataset.baselineY);
-
-        totalHeight += fSize;
-      });
-
-      return totalHeight;
-    },
-    getLowerThirdsBlanks: function() {
-      var inputsArray = settings.text,
-          blankInputs = 0;
-
-      inputsArray.forEach(function(input) {
-        if (!input.value) {
-          blankInputs++;
-        }
-      });
-
-      return blankInputs;
+      content.image.width = newWidth;
+      content.image.height = newHeight;
+      console.log("Phoner dimensions are: " + newWidth + ", " + newHeight);
     },
     matchString: function(search, find) {
       // search.toLowerCase();
@@ -243,12 +229,12 @@ var generator = (function () {
         reader.onload = function(event) {
           // Must be image.src, see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
           image.src = event.target.result;
-          settings.image = image;
+          content.image = image;
         };
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
         actions.enableInputs();
-        actions.clearInputs();
+        if (settings.template == "portrait") actions.clearInputs();
         console.log("User image uploaded successfully.");
       }
 
@@ -260,92 +246,94 @@ var generator = (function () {
       var width = settings.width,
           height = settings.height,
           context = settings.context,
-          image = settings.image;
+          image = content.image;
 
       actions.clearCanvas();
       context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
       actions.fitImage(image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
       actions.fitImage(image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
-      actions.saveState();
     },
     renderLowerThirds: function() {
-      var inputsArray = settings.text,
-          blankInputs = actions.getLowerThirdsBlanks(),
+      var inputsArray = document.querySelectorAll(".js-add-text-group"),
+          blankInputs = 0,
+          totalHeight = 0,
           startX = 80,
-          marginRight = 35,
-          image = settings.image;
+          startY = 720,
+          marginTop = 5;
 
-      if (settings.image != "No image set.") startX += settings.image.width + marginRight;
+      // Check for blankInputs and get totalHeight
+      inputsArray.forEach(function(input) {
+        var fSize = Number(input.dataset.fontSize);
+        if (!input.value) blankInputs++;
+        totalHeight += fSize;
+        startY -= fSize + marginTop;
+      });
 
-      if (blankInputs > 1) {
-        alert(blankInputs + " text fields are empty. Please fill them out before submitting.");
-      } else if (blankInputs === 1) {
-        alert(blankInputs + " text field is empty. Please fill it out before submitting.");
+      startY -= 40;
+      console.log(startY);
+
+      // If no blankInputs, then get then render inputs using their data-attributes
+      if (blankInputs > 0) {
+        alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
       } else {
         actions.clearCanvas();
         actions.addBottomGradient(1/3);
-
-        if (image != "No image set.") {
-          settings.context.drawImage(image, 80, image.startY, image.width, image.height);
+        if (content.image != "No image set.") {
+          actions.getPhonerSize(totalHeight);
+          settings.context.drawImage(content.image, startX, startY, content.image.width, content.image.height);
+          startX += content.image.width + 20;
         }
-
-        inputsArray.forEach(function(input) {
-          inputValue = input.value;
-          fSize = input.dataset.fontSize;
-          fWeight = input.dataset.fontWeight;
-          baselineY = input.dataset.baselineY;
-
-          actions.drawText(inputValue, fSize, fWeight, startX, baselineY);
-        });
+        for (var i = 0; i < inputsArray.length; i++) {
+          actions.drawText(inputsArray[i].value, inputsArray[i].dataset.fontSize, inputsArray[i].dataset.fontWeight, startX, startY);
+          startY += Number(inputsArray[i].dataset.fontSize) + marginTop;
+        }
+        actions.enableInputs();
       }
     },
-    restoreState: function() {
-      settings.context.drawImage(canvasCopy, 0, 0);
-    },
-    saveState: function() {
-      var contextCopy = canvasCopy.getContext("2d");
-      contextCopy.drawImage(canvas, 0, 0);
+    textGroupProps: function() {
+      var inputsArray = document.querySelectorAll(".js-add-text-group"),
+          properties = {
+            blankInputs: 0,
+            totalHeight: 0
+          };
+
+      inputsArray.forEach(function(input) {
+        var fSize = Number(input.dataset.fontSize);
+        if (!input.value) properties.blankInputs++;
+        properties.totalHeight += fSize;
+      });
+
+      return properties;
     }
   };
 
   function _addListeners() {
-    var fieldButtons = document.querySelectorAll(".generator__button--add-margin-top");
+    var fieldsets = document.querySelectorAll(".generator__fieldset");
 
-    fieldButtons.forEach(function(button) {
-      var parent = button.parentElement,
-          inputsArray = parent.querySelectorAll("input"),
-          input = inputsArray[0],
-          inputClass = input.className;
+    fieldsets.forEach(function(fieldset) {
+      var fieldButton = fieldset.querySelector(".generator__button"),
+          fieldInput = fieldset.querySelector("input");
 
-      if (inputsArray.length > 1) {
-        settings.text = inputsArray;
-      }
-
-      button.addEventListener("click", function() {
+      fieldButton.addEventListener("click", function() {
+        var inputClass = fieldInput.className,
+            inputValue = fieldInput.value;
 
         switch (true) {
           case actions.matchString(inputClass, "js-add-courtesy"):
-            actions.addCourtesy(input.value);
+            actions.addCourtesy(inputValue);
             break;
           case actions.matchString(inputClass, "js-upload-portrait"):
-            input.click();
-            input.onchange = function() {
-              actions.readFile(input, actions.renderPortrait);
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderPortrait);
             };
             break;
           case actions.matchString(inputClass, "js-upload-phoner"):
-            input.click();
-            input.onchange = function() {
-              actions.readFile(input, actions.addPhoner);
+            fieldInput.click();
+            fieldInput.onchange = function() {
+              actions.readFile(fieldInput, actions.renderLowerThirds);
             };
-            break;
-          case actions.matchString(inputClass, "js-add-text-single"):
-            actions.clearCanvas();
-            if (settings.template == "lower-thirds") {
-              actions.addBottomGradient(1/3);
-            }
-            actions.drawText(input.value, input.dataset.fontSize, input.dataset.fontWeight, 80, input.dataset.baselineY);
             break;
           case actions.matchString(inputClass, "js-add-text-group"):
             actions.renderLowerThirds();
@@ -358,8 +346,35 @@ var generator = (function () {
     });
   }
 
+  function _setSortables() {
+    var sortParent = document.getElementById("jsSortable");
+    if (sortParent) {
+      var sortable = Sortable.create(sortParent, {
+        draggable: ".js-sortable-item", // must include the dot
+        dragClass: "js-sortable-drag",
+        ghostClass: "js-sortable-ghost",
+        chosenClass: "js-sortable-chosen",
+        filter: ".js-sortable-remove",
+        onFilter: function(event) {
+          var item = event.item,
+              control = event.target;
+
+          if (Sortable.utils.is(control, ".js-sortable-remove")) {
+            item.parentNode.removeChild(item);
+          }
+        },
+        onEnd: function(event) {
+          //
+        }
+      });
+    } else {
+      console.log("No sortable items found.");
+    }
+  }
+
   // Inits
   _addListeners();
+  _setSortables();
 
   if (settings.template == "lower-thirds") {
     actions.addBottomGradient(1/3);

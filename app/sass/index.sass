@@ -83,17 +83,17 @@ input[type="text"]
     color: $placeholder-color
 
   &::-moz-placeholder
-  font-size: $placeholder-size
-  color: $placeholder-color
+    font-size: $placeholder-size
+    color: $placeholder-color
 
   &:-ms-input-placeholder
-  font-size: $placeholder-size
-  color: $placeholder-color
+    font-size: $placeholder-size
+    color: $placeholder-color
 
   &:-moz-placeholder
-  font-size: $placeholder-size
-  color: $placeholder-color
-  opacity: 1
+    font-size: $placeholder-size
+    color: $placeholder-color
+    opacity: 1
 
 input[type="range"]
   width: 100%
@@ -200,9 +200,6 @@ img
     font-weight: 500
     color: white
 
-    &--add-margin-top
-      margin-top: 18px
-
   &__header
     width: 100%
     padding-top: 35px
@@ -238,6 +235,7 @@ img
   &__input
     display: block
     width: 100%
+    margin-bottom: 15px
     font-size: 18px
     color: $white-medium
 
@@ -255,8 +253,13 @@ img
       padding: 12px 15px
       border: 5px solid $white-light
 
-    &--add-margin-bottom
-      margin-bottom: 15px
+  &__label
+    padding: 5px 10px
+    background-color: $white-light
+    font-size: 10px
+    font-weight: 800
+    text-transform: uppercase
+    color: white
 
   &__directions
     display: block
@@ -284,3 +287,25 @@ img
 
   &__card
     width: 100%
+
+.js-sortable-item
+  position: relative
+
+.js-sortable-remove
+  width: 30px
+  height: 30px
+  display: block
+  position: absolute
+  top: 30px
+  right: 25px
+  cursor: pointer
+  
+  background:
+    image: url("../img/icons/icon-close.png")
+    repeat: no-repeat
+    size: cover
+
+.js-sortable-ghost > *
+  color: $white-dark
+  border-color: $white-dark
+  background-color: $white-dark
