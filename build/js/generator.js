@@ -38,6 +38,7 @@ var generator = (function () {
     addCourtesy: function(courtesy) {
       var fSize = 30,
           fWeight = "bold",
+          fColor = "white",
           startX = 100,
           startY = 35,
           rectColor = "black",
@@ -45,7 +46,7 @@ var generator = (function () {
           padding = { top: 14, right: 70, bottom: 35, left: 35 };
 
       if (courtesy.length > 0) {
-        actions.drawTextWithRect(courtesy, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding);
+        actions.drawTextWithRect(courtesy, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, padding);
       } else {
         alert("Courtesy field is empty. Please enter text before submitting.");
       }
@@ -149,7 +150,7 @@ var generator = (function () {
         }
       }
     },
-    drawTextWithRect: function(text, fSize, fWeight, startX, startY, rectColor, rectOpacity, padding) {
+    drawTextWithRect: function(text, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, padding) {
       var context = settings.context,
           font = settings.font;
 
@@ -158,18 +159,17 @@ var generator = (function () {
 
       context.font = font.weight + " " + font.size + "px " + font.family; // Set font properly
       context.textBaseline = "top"; // Draw text from top - makes life easier at the moment
-      // context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
       context.fillStyle = rectColor;
 
       // Get width and height of rectangle using text size
       var rectWidth = context.measureText(text).width;
       var rectHeight = font.size;
 
-      if (rectOpacity > 0) context.globalAlpha = 0.5;
+      if (rectOpacity) context.globalAlpha = rectOpacity;
 
       context.fillRect(startX, startY, (rectWidth + padding.right), (rectHeight + padding.bottom));
       context.globalAlpha = 1.0; // Reset opacity for future drawings
-      context.fillStyle = "white";
+      context.fillStyle = fColor;
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
     enableInputs: function() {
@@ -320,6 +320,49 @@ var generator = (function () {
         actions.enableInputs();
       }
     },
+    renderL3_Phoner: function() {
+      var inputsArray = document.querySelectorAll(".js-add-text-group"),
+          blankInputs = 0,
+          fColor = "",
+          startX = 80,
+          startY = 450,
+          rectColor = "",
+          rectOpacity = 1,
+          padding = { top: 10, right: 60, bottom: 31, left: 25 };
+
+      // Check for blankInputs and get totalHeight
+      inputsArray.forEach(function(input) {
+        if (!input.value) blankInputs++;
+      });
+
+      if (blankInputs > 0) {
+        alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
+      } else {
+        actions.clearCanvas();
+        if (content.image != "No image set.") {
+          settings.context.strokeStyle = "white";
+          settings.context.lineWidth = 10;
+          settings.context.strokeRect(startX, startY, 217, 217);
+          actions.fitImage(settings.context, content.image, 217, 217, startX, startY, 0.5, 0);
+          startX += 217 + 20;
+        }
+        for (var i = 0; i < inputsArray.length; i++) {
+          if (i === 0) {
+            rectColor = "black";
+            fColor = "white";
+          } else {
+            rectColor = "white";
+            fColor = "black";
+          }
+          if (i === 1) startY = 530;
+          if (i === 2) startY = 600;
+          actions.drawTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), fColor, startX, startY, rectColor, rectOpacity, padding);
+        }
+        actions.enableInputs();
+      }
+
+      console.log(blankInputs);
+    },
     renderSideLeft: function() {
       actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0);
     },
@@ -365,7 +408,11 @@ var generator = (function () {
             actions.addCourtesy(inputValue);
             break;
           case actions.matchString(inputClass, "js-add-text-group"):
-            actions.renderLowerThirds();
+            if (settings.template == "lower-thirds") {
+              actions.renderLowerThirds();
+            } else if (settings.template == "lower-thirds-phoner") {
+              actions.renderL3_Phoner();
+            }
             break;
           case actions.matchString(inputClass, "js-upload-article"):
             fieldInput.click();
@@ -382,7 +429,11 @@ var generator = (function () {
           case actions.matchString(inputClass, "js-upload-phoner"):
             fieldInput.click();
             fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderLowerThirds);
+              if (settings.template == "lower-thirds") {
+                actions.readFile(fieldInput, actions.renderLowerThirds);
+              } else if (settings.template == "lower-thirds-phoner") {
+                actions.readFile(fieldInput, actions.renderL3_Phoner);
+              }
             };
             break;
           case actions.matchString(inputClass, "js-upload-portrait"):

@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    title TheBlaze – Day-of-Air Graphics Generator
+    meta(name="description", content="A client-side application for TV producers that generates screen graphics.")
+    meta(name="author", content="Max Giron")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="css/styles.css")
+    link(rel="icon", type="image/png", href="images/favicon.png")
+      
+  body
+    .generator
+      header.generator__header
+        h1.generator__title Create your graphic
+      section.generator__preview
+        h2.generator__caption Preview
+        canvas.generator__canvas.generator__canvas--add-background-image(width="1280" height="720" data-template="lower-thirds-phoner")
+      section.generator__controls
+        fieldset.generator__fieldset
+          label.generator__directions Drag and re-order, or remove text as needed.
+          span.generator__label Small Text
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="500")
+          span.generator__label Large Text
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500")
+          span.generator__label Small Text
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
+          button.generator__button(type="button") Add Text Group
+        fieldset.generator__fieldset.generator__fieldset--disabled
+          label.generator__directions Upload a portrait or landscape photo as the phoner.
+          input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none" disabled)
+          span.generator__input.generator__input--image No file uploaded yet.
+          button.generator__button(type="button" disabled) Choose Image
+      footer.generator__footer
+        button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
+  script(src="js/file-saver.min.js")
+  script(src="js/Sortable.min.js")
+  script(src="js/generator.js")
