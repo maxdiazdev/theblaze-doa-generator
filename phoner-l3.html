@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>TheBlaze – Day-of-Air Graphics Generator</title>
+    <meta name="description" content="A client-side application for TV producers that generates screen graphics.">
+    <meta name="author" content="Max Giron">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+  </head>
+  <body>
+    <div class="generator">
+      <header class="generator__header">
+        <h1 class="generator__title">Create your graphic</h1>
+      </header>
+      <section class="generator__preview">
+        <h2 class="generator__caption">Preview</h2>
+        <canvas class="generator__canvas generator__canvas--add-background-image" width="1280" height="720" data-template="lower-thirds-phoner"></canvas>
+      </section>
+      <section class="generator__controls">
+        <fieldset class="generator__fieldset">
+          <label class="generator__directions">Drag and re-order, or remove text as needed.</label><span class="generator__label">Small Text</span>
+          <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="500"><span class="generator__label">Large Text</span>
+          <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500"><span class="generator__label">Small Text</span>
+          <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400">
+          <button class="generator__button" type="button">Add Text Group</button>
+        </fieldset>
+        <fieldset class="generator__fieldset generator__fieldset--disabled">
+          <label class="generator__directions">Upload a portrait or landscape photo as the phoner.</label>
+          <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;" disabled><span class="generator__input generator__input--image">No file uploaded yet.</span>
+          <button class="generator__button" type="button" disabled>Choose Image</button>
+        </fieldset>
+      </section>
+      <footer class="generator__footer">
+        <button class="generator__button" type="button" onclick="generator.downloadCanvas()">Download Results</button>
+      </footer>
+    </div>
+  </body>
+  <script src="js/file-saver.min.js"></script>
+  <script src="js/Sortable.min.js"></script>
+  <script src="js/generator.js"></script>
+</html>
