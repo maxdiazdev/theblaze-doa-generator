@@ -105,11 +105,8 @@ var generator = (function () {
     },
     downloadCanvas: function() {
       canvas.toBlob(function(blob) {
-        if (settings.template == "lower-thirds") {
-          saveAs(blob, "Untitled_1280x720.png");
-        } else {
-          saveAs(blob, "Untitled_1280x720.jpg");
-        }
+        settings.template = settings.template.toUpperCase();
+        saveAs(blob, settings.template + "_Insert-title-here.jpg");
       });
     },
     drawText: function(string, fSize, fWeight, startX, startY) {
@@ -253,7 +250,7 @@ var generator = (function () {
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
         actions.enableInputs();
-        if (actions.matchString(settings.template, "fullscreen")) actions.clearInputs();
+        if (actions.matchString(settings.template, "fs_")) actions.clearInputs();
         console.log("User image uploaded successfully.");
       }
 
@@ -278,7 +275,7 @@ var generator = (function () {
       context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
       actions.fitImage(context, image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
-      actions.fitImage(context, image, ((width / 2) - (width / 25)), height, (width / 2), 0); // Fit foreground image against the half-way point of canvas, crop as portrait
+      actions.fitImage(context, image, ((width / 2) - (width / 25)), height, (width / 2), 0, 0.5, 0); // Fit foreground image against the half-way point of canvas, crop as portrait
     },
     renderLandscape: function() {
       actions.fitImage(settings.context, content.image, settings.width, settings.height, 0, 0);
@@ -364,10 +361,10 @@ var generator = (function () {
       console.log(blankInputs);
     },
     renderSideLeft: function() {
-      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0);
+      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0, 0.5, 0);
     },
     renderSideRight: function() {
-      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, settings.width / 2, 0);
+      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, settings.width / 2, 0, 0.5, 0);
     },
     rotateArticle: function(degrees) {
       var canvas = document.createElement("canvas"),
@@ -398,9 +395,9 @@ var generator = (function () {
 
         switch (true) {
           case actions.matchString(inputClass, "js-add-courtesy"):
-            if (settings.template == "portrait-fullscreen") {
+            if (settings.template == "fs_portrait") {
               actions.renderPortrait();
-            } else if (settings.template == "landscape-fullscreen") {
+            } else if (settings.template == "fs_landscape") {
               actions.renderLandscape();
             } else {
               actions.clearCanvas();
@@ -408,9 +405,9 @@ var generator = (function () {
             actions.addCourtesy(inputValue);
             break;
           case actions.matchString(inputClass, "js-add-text-group"):
-            if (settings.template == "lower-thirds") {
+            if (settings.template == "l3_gradient") {
               actions.renderLowerThirds();
-            } else if (settings.template == "lower-thirds-phoner") {
+            } else if (settings.template == "l3_phoner") {
               actions.renderL3_Phoner();
             }
             break;
@@ -429,9 +426,9 @@ var generator = (function () {
           case actions.matchString(inputClass, "js-upload-phoner"):
             fieldInput.click();
             fieldInput.onchange = function() {
-              if (settings.template == "lower-thirds") {
+              if (settings.template == "l3_gradient") {
                 actions.readFile(fieldInput, actions.renderLowerThirds);
-              } else if (settings.template == "lower-thirds-phoner") {
+              } else if (settings.template == "l3_phoner") {
                 actions.readFile(fieldInput, actions.renderL3_Phoner);
               }
             };
@@ -492,9 +489,9 @@ var generator = (function () {
   _addListeners();
   _setSortables();
 
-  if (settings.template == "lower-thirds") {
+  if (settings.template == "l3_gradient") {
     actions.addBottomGradient(1/3);
-  } else if (settings.template == "article-headline") {
+  } else if (settings.template == "fs_article") {
     actions.addRadialGradient();
   }
 
