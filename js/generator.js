@@ -105,18 +105,17 @@ var generator = (function () {
       font.size = fSize;
       font.weight = fWeight;
 
-      switch(true) {
-        case actions.matchString(string, "facebook"):
-          socialIcon.src = "img/icons/icon-facebook.png";
-          break;
-        case actions.matchString(string, "instagram"):
-          socialIcon.src = "img/icons/icon-instagram.png";
-          break;
-        case actions.matchString(string, "twitter"):
-          socialIcon.src = "img/icons/icon-twitter.png";
-          break;
-        default:
-          socialIcon = false;
+      if (actions.matchString(string, "facebook")) {
+        socialIcon.src = "img/icons/icon-facebook.png";
+        if (actions.matchString(string, "@facebook")) string = string.replace("facebook ", "");
+      } else if (actions.matchString(string, "instagram")) {
+        socialIcon.src = "img/icons/icon-instagram.png";
+        if (actions.matchString(string, "@instagram")) string = string.replace("instagram ", "");
+      } else if (actions.matchString(string, "twitter")) {
+        socialIcon.src = "img/icons/icon-twitter.png";
+        if (actions.matchString(string, "@twitter")) string = string.replace("twitter ", "");
+      } else {
+       socialIcon = false;
       }
 
       if (string.length > 0) {
