@@ -2,6 +2,7 @@
 A client-side application for TV producers that generates standard graphics.
 
 ## Issues
+* Disable drag on inputs when trying to select and delete text
 * Require portrait or landscape photos depending on the template
 * Require minimum dimensions on photos, both for fullscreens and phoners
 * Update homepage look
