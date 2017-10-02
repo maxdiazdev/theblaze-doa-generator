@@ -163,9 +163,17 @@ var generator = (function () {
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
     downloadCanvas: function() {
+      var fileExtension = "";
+
+      if (settings.template == "courtesy-only" || settings.template == "l3_gradient" || settings.template == "l3_phoner") {
+        fileExtension = ".png";
+      } else {
+        fileExtension = ".jpg";
+      }
+
       canvas.toBlob(function(blob) {
         settings.template = settings.template.toUpperCase();
-        saveAs(blob, settings.template + "_Insert-title-here.jpg");
+        saveAs(blob, settings.template + "_Insert-title-here" + fileExtension);
       });
     },
     fitImage: function(context, image, width, height, startX, startY, offsetX, offsetY) {
