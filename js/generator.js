@@ -30,20 +30,21 @@ var generator = (function () {
           endY = height - height * ratio,
           gradient = context.createLinearGradient(startX, startY, endX, endY);
 
-      gradient.addColorStop(0, "rgba(0, 0, 0, 0.8)");
+      gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
+      gradient.addColorStop(0.5, "rgba(0, 0, 0, 0.7)");
       gradient.addColorStop(1, "rgba(0, 0, 0 ,0)");
       context.fillStyle = gradient;
       context.fillRect(startX, endY, width, height);
     },
     addCourtesy: function(courtesy) {
       var fSize = 30,
-          fWeight = "bold",
+          fWeight = 500,
           fColor = "white",
           startX = 100,
           startY = 35,
           rectColor = "black",
           rectOpacity = 0.5,
-          padding = { top: 14, right: 70, bottom: 35, left: 35 };
+          padding = { top: 7, right: 35, bottom: 21 , left: 18 };
 
       if (courtesy.length > 0) {
         actions.drawTextWithRect(courtesy, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, padding);
