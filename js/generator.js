@@ -4,6 +4,9 @@ var canvas = document.querySelector(".generator__canvas");
 // Begin generator module
 var generator = (function () {
 
+  // Firefox has 6-year-old bug with text alignment: https://github.com/CreateJS/EaselJS/issues/650
+  var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
   var settings = {
     width: canvas.width,
     height: canvas.height,
@@ -93,23 +96,6 @@ var generator = (function () {
       settings.context.drawImage(canvas, 0, 0);
 
     },
-    clearCanvas: function() {
-      settings.context.clearRect(0, 0, settings.width, settings.height);
-      settings.context.beginPath(); // Essential to clear rectangles, images, etc.
-    },
-    clearInputs: function() {
-      var allInputs = document.querySelectorAll("input");
-
-      allInputs.forEach(function(input) {
-        input.value = "";
-      });
-    },
-    downloadCanvas: function() {
-      canvas.toBlob(function(blob) {
-        settings.template = settings.template.toUpperCase();
-        saveAs(blob, settings.template + "_Insert-title-here.jpg");
-      });
-    },
     drawText: function(string, fSize, fWeight, startX, startY) {
       var font = settings.font,
           context = settings.context,
@@ -168,21 +154,19 @@ var generator = (function () {
       context.fillRect(startX, startY, (rectWidth + padding.right), (rectHeight + padding.bottom));
       context.globalAlpha = 1.0; // Reset opacity for future drawings
       context.fillStyle = fColor;
+
+      if (isFirefox) {
+        startY += 5;
+        console.log("Firefox detected. This browser has textBaseline issues. startY was adjusted to: " + startY);
+      }
+
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
-    enableInputs: function() {
-      var disabledField = document.querySelector(".generator__fieldset--disabled"),
-          children = "";
-
-      if (disabledField) {
-        children = disabledField.children;
-        disabledField.classList.remove("generator__fieldset--disabled");
-        for (var i = 0; i < children.length; i++) {
-          if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") {
-            children[i].disabled = false;
-          }
-        }
-      }
+    downloadCanvas: function() {
+      canvas.toBlob(function(blob) {
+        settings.template = settings.template.toUpperCase();
+        saveAs(blob, settings.template + "_Insert-title-here.jpg");
+      });
     },
     fitImage: function(context, image, width, height, startX, startY, offsetX, offsetY) {
       // Default offset is center
@@ -236,7 +220,7 @@ var generator = (function () {
       // search.toLowerCase();
       return search.includes(find);
     },
-    readFile: function(input, callback) {
+    readFile: function(event, input, callback) {
       var file = input.files[0],
           reader = new FileReader(),
           image = new Image(),
@@ -250,8 +234,8 @@ var generator = (function () {
         };
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
-        actions.enableInputs();
-        if (actions.matchString(settings.template, "fs_")) actions.clearInputs();
+        _enableInputs();
+        if (actions.matchString(settings.template, "fs_")) _clearInputs();
         console.log("User image uploaded successfully.");
       }
 
@@ -260,7 +244,7 @@ var generator = (function () {
       }, 200);
     },
     renderArticleHeadline: function() {
-      actions.clearCanvas();
+      _clearCanvas();
       settings.context.fillStyle = "white";
       settings.context.fillRect(0, 0, settings.width, settings.height);
       actions.rotateArticle(-5);
@@ -272,7 +256,7 @@ var generator = (function () {
           context = settings.context,
           image = content.image;
 
-      actions.clearCanvas();
+      _clearCanvas();
       context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
       actions.fitImage(context, image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
@@ -304,7 +288,7 @@ var generator = (function () {
       if (blankInputs > 0) {
         alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
       } else {
-        actions.clearCanvas();
+        _clearCanvas();
         actions.addBottomGradient(1/3);
         if (content.image != "No image set.") {
           actions.getPhonerSize(totalHeight);
@@ -315,7 +299,7 @@ var generator = (function () {
           actions.drawText(inputsArray[i].value, inputsArray[i].dataset.fontSize, inputsArray[i].dataset.fontWeight, startX, startY);
           startY += Number(inputsArray[i].dataset.fontSize) + marginTop;
         }
-        actions.enableInputs();
+        _enableInputs();
       }
     },
     renderL3_Phoner: function() {
@@ -336,7 +320,7 @@ var generator = (function () {
       if (blankInputs > 0) {
         alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
       } else {
-        actions.clearCanvas();
+        _clearCanvas();
         if (content.image != "No image set.") {
           settings.context.strokeStyle = "white";
           settings.context.lineWidth = 10;
@@ -356,7 +340,7 @@ var generator = (function () {
           if (i === 2) startY = 600;
           actions.drawTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), fColor, startX, startY, rectColor, rectOpacity, padding);
         }
-        actions.enableInputs();
+        _enableInputs();
       }
 
       console.log(blankInputs);
@@ -401,7 +385,7 @@ var generator = (function () {
             } else if (settings.template == "fs_landscape") {
               actions.renderLandscape();
             } else {
-              actions.clearCanvas();
+              _clearCanvas();
             }
             actions.addCourtesy(inputValue);
             break;
@@ -414,42 +398,48 @@ var generator = (function () {
             break;
           case actions.matchString(inputClass, "js-upload-article"):
             fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderArticleHeadline);
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
+              actions.readFile(event, fieldInput, actions.renderArticleHeadline);
             };
             break;
           case actions.matchString(inputClass, "js-upload-landscape"):
             fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderLandscape);
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
+              actions.readFile(event, fieldInput, actions.renderLandscape);
             };
             break;
           case actions.matchString(inputClass, "js-upload-phoner"):
             fieldInput.click();
-            fieldInput.onchange = function() {
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
               if (settings.template == "l3_gradient") {
-                actions.readFile(fieldInput, actions.renderLowerThirds);
+                actions.readFile(event, fieldInput, actions.renderLowerThirds);
               } else if (settings.template == "l3_phoner") {
-                actions.readFile(fieldInput, actions.renderL3_Phoner);
+                actions.readFile(event, fieldInput, actions.renderL3_Phoner);
               }
             };
             break;
           case actions.matchString(inputClass, "js-upload-portrait"):
             fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderPortrait);
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
+              actions.readFile(event, fieldInput, actions.renderPortrait);
             };
             break;
           case actions.matchString(inputClass, "js-upload-side-left"):
             fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderSideLeft);
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
+              actions.readFile(event, fieldInput, actions.renderSideLeft);
             };
             break;
           case actions.matchString(inputClass, "js-upload-side-right"):
             fieldInput.click();
-            fieldInput.onchange = function() {
-              actions.readFile(fieldInput, actions.renderSideRight);
+            fieldInput.onchange = function(event) {
+              event = event || window.event;
+              actions.readFile(event, fieldInput, actions.renderSideRight);
             };
             break;
           default:
@@ -458,6 +448,34 @@ var generator = (function () {
         }
       });
     });
+  }
+
+  function _clearCanvas() {
+    settings.context.clearRect(0, 0, settings.width, settings.height);
+    settings.context.beginPath(); // Essential to clear rectangles, images, etc.
+  }
+
+  function _clearInputs() {
+    var allInputs = document.querySelectorAll("input");
+
+    allInputs.forEach(function(input) {
+      input.value = "";
+    });
+  }
+
+  function _enableInputs() {
+    var disabledField = document.querySelector(".generator__fieldset--disabled"),
+        children = "";
+
+    if (disabledField) {
+      children = disabledField.children;
+      disabledField.classList.remove("generator__fieldset--disabled");
+      for (var i = 0; i < children.length; i++) {
+        if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") {
+          children[i].disabled = false;
+        }
+      }
+    }
   }
 
   function _setSortables() {
@@ -487,6 +505,7 @@ var generator = (function () {
   }
 
   // Inits
+  _clearInputs();
   _addListeners();
   _setSortables();
 
