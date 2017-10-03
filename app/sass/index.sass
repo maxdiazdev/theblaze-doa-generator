@@ -1,31 +1,20 @@
-// WHITES
-$white-light: scale-color(#F2F3F8, $lightness: -15%)
-$white-medium: scale-color(#EDEFF4, $lightness: -15%)
-$white-dark: scale-color(#E1E1E9, $lightness: -15%)
-
-// BLACKS
-$black-light: #BDBDBD
-$black-medium: #757575
-$black-dark: #212121
-
 // THEME COLORS
-$theme-red: #f44336
-$theme-blue: #607d8b
+$theme-black: #333333
 
 // RANGE HANDLE
 $handle-size: 25px
 $handle-radius: 50%
-$handle-color: $white-dark
+$handle-color: white
 
 // INPUT PLACEHOLDER
 $placeholder-size: 18px
-$placeholder-color: $white-dark
+$placeholder-color: #ededed
 
 
 // MIXINS
 @mixin bg-checkers
   background:
-    image: linear-gradient(45deg, $white-light 25%, transparent 25%), linear-gradient(-45deg, $white-light 25%, transparent 25%), linear-gradient(45deg, transparent 75%, $white-light 75%), linear-gradient(-45deg, transparent 75%, $white-light 75%)
+    image: linear-gradient(45deg, #ededed 25%, transparent 25%), linear-gradient(-45deg, #ededed 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ededed 75%), linear-gradient(-45deg, transparent 75%, #ededed 75%)
     color: white
     position: 0 0, 0 15px, 15px -15px, -15px 0px
     size: 30px 30px
@@ -53,7 +42,7 @@ $placeholder-color: $white-dark
 // RESETS
 body
   margin: 0
-  background-color: $white-light
+  background-color: #ededed
   font-family: "Helvetica Neue", "tex_gyre_heros", Arial, sans-serif
   font-size: 16px
 
@@ -191,7 +180,7 @@ img
     font-size: 43px
     font-weight: 500
     text-align: center
-    color: $white-medium
+    color: $theme-black
 
   &__caption
     margin-bottom: 10px
@@ -205,9 +194,13 @@ img
     padding: 12px 20px
     border: none
     border-radius: 3px
-    background-color: $white-dark
+    background-color: $theme-black
     font-weight: 500
     color: white
+
+    &--light
+      background-color: white
+      color: $theme-black
 
   &__header
     width: 100%
@@ -218,12 +211,12 @@ img
     width: 100%
     height: 300px
     padding: 20px 50px
-    background-color: $white-medium
+    background-color: $theme-black
 
   &__canvas
     width: 538px
     height: 303px
-    border: 5px solid $white-dark
+    border: 5px solid #ededed
     border-radius: 3px
     @include bg-checkers
 
@@ -239,32 +232,32 @@ img
     padding: 20px 50px
 
     &--disabled
-      opacity: 0.3
+      opacity: 0.15
 
   &__input
     display: block
     width: 100%
     margin-bottom: 15px
     font-size: 18px
-    color: $white-medium
+    color: $theme-black
 
     &--image
-      border: 5px dashed $white-light
+      border: 5px dashed #ededed
       padding: 12px 15px
 
     &--range
       padding-top: 20px
       padding-bottom: 20px
-      background-color: $white-light
+      background-color: #ededed
       overflow: hidden
 
     &--text
       padding: 12px 15px
-      border: 5px solid $white-light
+      border: 5px solid #ededed
 
   &__label
     padding: 5px 10px
-    background-color: $white-light
+    background-color: $theme-black
     font-size: 10px
     font-weight: 800
     text-transform: uppercase
@@ -276,26 +269,36 @@ img
     margin-bottom: 15px
     font-size: 20px
     font-weight: 500
-    color: $white-medium
+    color: $theme-black
 
   &__footer
     width: 100%
     padding-top: 25px
     padding-bottom: 25px
     margin-top: 50px
-    background-color: $white-medium
+    background-color: scale-color(#ededed, $lightness: -3%)
     text-align: center
 
 .grid
-  max-width: 1280px
-  margin: 10px auto
+  width: 1200px
+  margin: 15px auto
   display: grid
   grid-template-columns: 1fr 1fr 1fr
-  grid-column-gap: 10px
-  grid-row-gap: 10px
+  grid-column-gap: 15px
+  grid-row-gap: 15px
 
   &__card
     width: 100%
+    text-decoration: none
+
+  &__title
+    display: block
+    padding: 8px 25px
+    background-color: $theme-black
+    font-size: 15px
+    font-weight: 500
+    // text-transform: uppercase
+    color: white
 
 .js-sortable-item
   position: relative
@@ -315,6 +318,6 @@ img
     size: cover
 
 .js-sortable-ghost > *
-  color: $white-dark
-  border-color: $white-dark
-  background-color: $white-dark
+  color: $theme-black
+  border-color: $theme-black
+  background-color: $theme-black
