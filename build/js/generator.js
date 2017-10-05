@@ -161,11 +161,15 @@ var generator = (function () {
 
       context.fillText(text, (startX + padding.left), (startY + padding.top));
     },
-    downloadCanvas: function() {
-      canvas.toBlob(function(blob) {
-        settings.template = settings.template.toUpperCase();
-        saveAs(blob, settings.template + "_Insert-title-here.png");
-      });
+    downloadCanvas: function(fileName) {
+      if (fileName) {
+        canvas.toBlob(function(blob) {
+          settings.template = settings.template.toUpperCase();
+          saveAs(blob, settings.template + "_" + fileName + ".png");
+        });
+      } else {
+        alert("Please enter a file name before downloading.");
+      }
     },
     fitImage: function(context, image, width, height, startX, startY, offsetX, offsetY) {
       // Default offset is center
@@ -233,7 +237,6 @@ var generator = (function () {
         };
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         reader.readAsDataURL(event.target.files[0]);
-        _enableInputs();
         if (actions.matchString(settings.template, "fs_")) _clearInputs();
         console.log("User image uploaded successfully.");
       }
@@ -298,7 +301,6 @@ var generator = (function () {
           actions.drawText(inputsArray[i].value, inputsArray[i].dataset.fontSize, inputsArray[i].dataset.fontWeight, startX, startY);
           startY += Number(inputsArray[i].dataset.fontSize) + marginTop;
         }
-        _enableInputs();
       }
     },
     renderL3_Phoner: function() {
@@ -339,7 +341,6 @@ var generator = (function () {
           if (i === 2) startY = 600;
           actions.drawTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), fColor, startX, startY, rectColor, rectOpacity, padding);
         }
-        _enableInputs();
       }
 
       console.log(blankInputs);
@@ -385,6 +386,7 @@ var generator = (function () {
               actions.renderLandscape();
             } else {
               _clearCanvas();
+              _enableInputs();
             }
             actions.addCourtesy(inputValue);
             break;
@@ -394,12 +396,17 @@ var generator = (function () {
             } else if (settings.template == "l3_phoner") {
               actions.renderL3_Phoner();
             }
+            _enableInputs();
+            break;
+          case actions.matchString(inputClass, "js-file-name"):
+            actions.downloadCanvas(fieldInput.value);
             break;
           case actions.matchString(inputClass, "js-upload-article"):
             fieldInput.click();
             fieldInput.onchange = function(event) {
               event = event || window.event;
               actions.readFile(event, fieldInput, actions.renderArticleHeadline);
+              _enableInputs();
             };
             break;
           case actions.matchString(inputClass, "js-upload-landscape"):
@@ -407,6 +414,7 @@ var generator = (function () {
             fieldInput.onchange = function(event) {
               event = event || window.event;
               actions.readFile(event, fieldInput, actions.renderLandscape);
+              _enableInputs();
             };
             break;
           case actions.matchString(inputClass, "js-upload-phoner"):
@@ -425,6 +433,7 @@ var generator = (function () {
             fieldInput.onchange = function(event) {
               event = event || window.event;
               actions.readFile(event, fieldInput, actions.renderPortrait);
+              _enableInputs();
             };
             break;
           case actions.matchString(inputClass, "js-upload-side-left"):
@@ -439,6 +448,7 @@ var generator = (function () {
             fieldInput.onchange = function(event) {
               event = event || window.event;
               actions.readFile(event, fieldInput, actions.renderSideRight);
+              _enableInputs();
             };
             break;
           default:
@@ -463,18 +473,15 @@ var generator = (function () {
   }
 
   function _enableInputs() {
-    var disabledField = document.querySelector(".generator__fieldset--disabled"),
+    var disabledField = document.querySelectorAll(".generator__fieldset--disabled"),
         children = "";
 
-    if (disabledField) {
-      children = disabledField.children;
-      disabledField.classList.remove("generator__fieldset--disabled");
+    disabledField.forEach(function(field) {
+      field.classList.remove("generator__fieldset--disabled");
       for (var i = 0; i < children.length; i++) {
-        if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") {
-          children[i].disabled = false;
-        }
+        if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") children[i].disabled = false;
       }
-    }
+    });
   }
 
   function _setSortables() {

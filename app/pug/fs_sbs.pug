@@ -27,7 +27,9 @@ html(lang="en")
           input.js-upload-side-right(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button") Choose Image
-      footer.generator__footer
-        button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
+        fieldset.generator__fieldset.generator__fieldset--disabled
+          label.generator__directions Name your graphic and download.
+          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
+          button.generator__button(type="button" disabled) Download File
   script(src="js/file-saver.min.js")
   script(src="js/generator.js")

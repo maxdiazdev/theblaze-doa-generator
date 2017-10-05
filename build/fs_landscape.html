@@ -29,10 +29,12 @@
           <input class="js-add-courtesy generator__input generator__input--text" type="text" placeholder="Type a courtesy here." disabled>
           <button class="generator__button" type="button" disabled>Add Courtesy</button>
         </fieldset>
+        <fieldset class="generator__fieldset generator__fieldset--disabled">
+          <label class="generator__directions">Name your graphic and download.</label>
+          <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
+          <button class="generator__button" type="button" disabled>Download File</button>
+        </fieldset>
       </section>
-      <footer class="generator__footer">
-        <button class="generator__button" type="button" onclick="generator.downloadCanvas()">Download Results</button>
-      </footer>
     </div>
   </body>
   <script src="js/file-saver.min.js"></script>

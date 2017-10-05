@@ -29,10 +29,12 @@
           <input class="js-upload-side-right" type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
           <button class="generator__button" type="button">Choose Image</button>
         </fieldset>
+        <fieldset class="generator__fieldset generator__fieldset--disabled">
+          <label class="generator__directions">Name your graphic and download.</label>
+          <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
+          <button class="generator__button" type="button" disabled>Download File</button>
+        </fieldset>
       </section>
-      <footer class="generator__footer">
-        <button class="generator__button generator__button--light" type="button" onclick="generator.downloadCanvas()">Download Results</button>
-      </footer>
     </div>
   </body>
   <script src="js/file-saver.min.js"></script>

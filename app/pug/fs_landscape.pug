@@ -26,7 +26,9 @@ html(lang="en")
           label.generator__directions Add a courtesy to your graphic. It's optional.
           input.js-add-courtesy.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here." disabled)
           button.generator__button(type="button" disabled) Add Courtesy
-      footer.generator__footer
-        button.generator__button(type="button" onclick="generator.downloadCanvas()") Download Results
+        fieldset.generator__fieldset.generator__fieldset--disabled
+          label.generator__directions Name your graphic and download.
+          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
+          button.generator__button(type="button" disabled) Download File
   script(src="js/file-saver.min.js")
   script(src="js/generator.js")
