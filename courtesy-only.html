@@ -16,7 +16,7 @@
       </header>
       <section class="generator__preview">
         <h2 class="generator__caption">Preview</h2>
-        <canvas class="generator__canvas" width="1280" height="720" data-template="courtesy-only"></canvas>
+        <canvas class="generator__canvas" width="1280" height="720" data-template="courtesy"></canvas>
       </section>
       <section class="generator__controls">
         <fieldset class="generator__fieldset">
@@ -24,10 +24,12 @@
           <input class="js-add-courtesy generator__input generator__input--text" type="text" placeholder="Type a courtesy here.">
           <button class="generator__button" type="button">Add Courtesy</button>
         </fieldset>
+        <fieldset class="generator__fieldset generator__fieldset--disabled">
+          <label class="generator__directions">Name your graphic and download.</label>
+          <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
+          <button class="generator__button" type="button" disabled>Download File</button>
+        </fieldset>
       </section>
-      <footer class="generator__footer">
-        <button class="generator__button" type="button" onclick="generator.downloadCanvas()">Download Results</button>
-      </footer>
     </div>
   </body>
   <script src="js/file-saver.min.js"></script>
