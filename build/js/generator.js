@@ -473,10 +473,10 @@ var generator = (function () {
   }
 
   function _enableInputs() {
-    var disabledField = document.querySelectorAll(".generator__fieldset--disabled"),
-        children = "";
+    var disabledField = document.querySelectorAll(".generator__fieldset--disabled");
 
     disabledField.forEach(function(field) {
+      var children = field.children;
       field.classList.remove("generator__fieldset--disabled");
       for (var i = 0; i < children.length; i++) {
         if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") children[i].disabled = false;
