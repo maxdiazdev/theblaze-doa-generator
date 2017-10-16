@@ -353,7 +353,7 @@ var generator = (function () {
         }
       }
     },
-    renderL3_Phoner: function() {
+    renderL3_Phoner: function(offsetCropX, offsetCropY) {
       var inputsArray = document.querySelectorAll(".js-add-text-group"),
           blankInputs = 0,
           fColor = "",
@@ -362,6 +362,9 @@ var generator = (function () {
           rectColor = "",
           rectOpacity = 1,
           padding = { top: 5, right: 40, bottom: 20, left: 20 };
+
+      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
+      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
 
       // Check for blankInputs and get totalHeight
       inputsArray.forEach(function(input) {
@@ -376,7 +379,8 @@ var generator = (function () {
           settings.context.strokeStyle = "white";
           settings.context.lineWidth = 7;
           settings.context.strokeRect(startX, 500, 178, 178);
-          actions.fitImage(settings.context, content.image, 178, 178, startX, 500, 0.5, 0);
+          actions.fitImage(settings.context, content.image, 178, 178, startX, 500, offsetCropX, offsetCropY);
+          document.getElementById("jsDisplayYPos").value = offsetCropY * 100;
           startX += 178 + 20;
         }
 
@@ -541,14 +545,16 @@ var generator = (function () {
                 // Get value and if it isn't zero, decrease by 10
                 if (imagePos > 0) {
                   imagePos -= 10;
-                  actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "fs_portrait") actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
                 }
                 break;
               case actions.matchString(buttonClass, "js-ypos-increase"):
                 // Get value and if it isn't zero, decrease by 10
                 if (imagePos < 100) {
                   imagePos += 10;
-                  actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "fs_portrait") actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
                 }
                 break;
               default:
