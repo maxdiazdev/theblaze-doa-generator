@@ -186,9 +186,9 @@ var generator = (function () {
 
       var imageWidth = image.width,
           imageHeight = image.height,
-          ratio = Math.min(destinationWidth / imageWidth, destinationHeight / imageHeight),
-          newImageWidth = imageWidth * ratio,   // New prop. width
-          newImageHeight = imageHeight * ratio,   // New prop. height
+          canvasRatio = Math.min(destinationWidth / imageWidth, destinationHeight / imageHeight),
+          newImageWidth = imageWidth * canvasRatio,   // New width of scaled up image
+          newImageHeight = imageHeight * canvasRatio,   // New height of scaled up image
           croppedAtX, subRectY, subRectWidth, subRectHeight, aspectRatio = 1;
 
       // Decide which gap to fill
@@ -262,21 +262,28 @@ var generator = (function () {
           if (actions.matchString(settings.template, "fs_")) _clearInputs();
 
           if (settings.template == "fs_portrait") {
-            newImageWidth = imageRatio * image.width;
+            newImageWidth = imageRatio * settings.height;
+            // newImageHeight = imageRatio * image.height; // Different than above, because we want to see what the scaled-up height of the image is
+
             if (newImageWidth >= maxPortraitWidth) {
               document.getElementById("jsAdjustPortrait").classList.remove("generator__fieldset--hidden");
             } else {
               document.getElementById("jsAdjustPortrait").classList.add("generator__fieldset--hidden");
             }
+
+            console.log("newImageWidth: " + newImageWidth);
           }
 
           if (settings.template == "fs_landscape") {
-            newImageHeight = imageRatio * image.height;
-            if (newImageHeight >= settings.height) {
+            newImageHeight = imageRatio * settings.width;
+
+            if (imageRatio != settings.width / settings.height && newImageHeight > settings.height) {
               document.getElementById("jsAdjustLandscape").classList.remove("generator__fieldset--hidden");
             } else {
               document.getElementById("jsAdjustLandscape").classList.add("generator__fieldset--hidden");
             }
+
+            console.log("imageRatio: " + imageRatio + ", canvasRatio: " + settings.width / settings.height);
           }
 
           console.log("User image uploaded successfully.");
@@ -297,8 +304,8 @@ var generator = (function () {
           context = settings.context,
           image = content.image,
           imageRatio = image.width / image.height,
-          newImageWidth = imageRatio * image.width,
-          maxPortraitWidth = (width / 2) - (width / 25);
+          maxPortraitWidth = (width / 2) - (width / 25),
+          newImageWidth = imageRatio * height;
 
       // Most of these defaults are already set in fitImage, but I had to set them here, too, to display in input
       offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
@@ -553,7 +560,7 @@ var generator = (function () {
                 // Get value and if it isn't zero, decrease by 10
                 if (imagePos > 0) {
                   imagePos -= 10;
-                  if (settings.template == "fs_portrait") actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "fs_landscape") actions.renderLandscape(null, imagePos / 100);
                   if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
                 }
                 break;
@@ -561,7 +568,7 @@ var generator = (function () {
                 // Get value and if it isn't zero, decrease by 10
                 if (imagePos < 100) {
                   imagePos += 10;
-                  if (settings.template == "fs_portrait") actions.renderLandscape(null, imagePos / 100);
+                  if (settings.template == "fs_landscape") actions.renderLandscape(null, imagePos / 100);
                   if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
                 }
                 break;
