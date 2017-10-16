@@ -27,10 +27,15 @@ html(lang="en")
           input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400")
           button.generator__button(type="button") Add Text Group
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Upload phoner's photo. Can be portrait or landscape.
+          label.generator__directions Upload phoner's photo. Must be portrait-oriented.
           input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none" disabled)
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button" disabled) Choose Image
+        fieldset#jsAdjustPhoner.generator__fieldset
+          label.generator__directions Adjust the photo horizontally, if needed.
+          input#jsDisplayYPos.generator__input.generator__input--number(type="number" min="0" max="100" step="10" placeholder="Y Position")
+          button.js-ypos-decrease.generator__button(type="button") -10%
+          button.js-ypos-increase.generator__button(type="button") +10%
         fieldset.generator__fieldset.generator__fieldset--disabled
           label.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Example: L3-PHONER_John-Smith" disabled)
