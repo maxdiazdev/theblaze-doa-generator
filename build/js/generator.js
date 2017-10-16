@@ -12,14 +12,12 @@ var generator = (function () {
     height: canvas.height,
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
-    font: { family:"\"Helvetica Neue\", \"tex_gyre_heros\", Arial, sans-serif" },
-    text: "No text set.",
-    image: "No image set."
+    font: { family:"\"Helvetica Neue\", \"tex_gyre_heros\", Arial, sans-serif" }
   };
 
   var content = {
     text: "No text set.",
-    image: "No image set.",
+    image: "No image set."
   };
 
   var actions = {
@@ -171,45 +169,51 @@ var generator = (function () {
         alert("Please enter a file name before downloading.");
       }
     },
-    fitImage: function(context, image, width, height, startX, startY, offsetX, offsetY) {
+    fitImage: function(context, image, destinationWidth, destinationHeight, destinationX, destinationY, offsetCropX, offsetCropY) {
+
       // Default offset is center
-      offsetX = typeof offsetX === "number" ? offsetX : 0.5;
-      offsetY = typeof offsetY === "number" ? offsetY : 0.5;
+      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
+      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
+
+      // console.log("fitImage: " + offsetCropX + ", " + offsetCropY);
 
       // Keep bounds [0.0, 1.0]
-      if (offsetX < 0) offsetX = 0;
-      if (offsetY < 0) offsetY = 0;
-      if (offsetX > 1) offsetX = 1;
-      if (offsetY > 1) offsetY = 1;
+      if (offsetCropX < 0) offsetCropX = 0;
+      if (offsetCropY < 0) offsetCropY = 0;
+      if (offsetCropX > 1) offsetCropX = 1;
+      if (offsetCropY > 1) offsetCropY = 1;
 
       var imageWidth = image.width,
           imageHeight = image.height,
-          ratio = Math.min(width / imageWidth, height / imageHeight),
-          newWidth = imageWidth * ratio,   // New prop. width
-          newHeight = imageHeight * ratio,   // New prop. height
-          containerX, containerY, containerWidth, containerHeight, aspectRatio = 1;
+          ratio = Math.min(destinationWidth / imageWidth, destinationHeight / imageHeight),
+          newImageWidth = imageWidth * ratio,   // New prop. width
+          newImageHeight = imageHeight * ratio,   // New prop. height
+          croppedAtX, subRectY, subRectWidth, subRectHeight, aspectRatio = 1;
 
       // Decide which gap to fill
-      if (newWidth < width) aspectRatio = width / newWidth;
-      if (Math.abs(aspectRatio - 1) < 1e-14 && newHeight < height) aspectRatio = height / newHeight;
-      newWidth *= aspectRatio;
-      newHeight *= aspectRatio;
+      if (newImageWidth < destinationWidth) aspectRatio = destinationWidth / newImageWidth;
+      if (Math.abs(aspectRatio - 1) < 1e-14 && newImageHeight < destinationHeight) aspectRatio = destinationHeight / newImageHeight;
+      newImageWidth *= aspectRatio;
+      newImageHeight *= aspectRatio;
 
       // Calc source rectangle
-      containerWidth = imageWidth / (newWidth / width);
-      containerHeight = imageHeight / (newHeight / height);
+      croppedImageWidth = imageWidth / (newImageWidth / destinationWidth);
+      croppedImageHeight = imageHeight / (newImageHeight / destinationHeight);
 
-      containerX = (imageWidth - containerWidth) * offsetX;
-      containerY = (imageHeight - containerHeight) * offsetY;
+      croppedAtX = (imageWidth - croppedImageWidth) * offsetCropX;
+      croppedAtY = (imageHeight - croppedImageHeight) * offsetCropY;
 
       // Make sure source rectangle is valid
-      if (containerX < 0) containerX = 0;
-      if (containerY < 0) containerY = 0;
-      if (containerWidth > imageWidth) containerWidth = imageWidth;
-      if (containerHeight > imageHeight) containerHeight = imageHeight;
+      if (croppedAtX < 0) croppedAtX = 0;
+      if (croppedAtY < 0) croppedAtY = 0;
+      if (croppedImageWidth > imageWidth) croppedImageWidth = imageWidth;
+      if (croppedImageHeight > imageHeight) croppedImageHeight = imageHeight;
+
+      // console.log("image: " + newImageWidth + ", " + newImageHeight);
+      // console.log("[imageData], " + "croppedAtX: " + croppedAtX + ", croppedAtY: " + croppedAtY + ", croppedImageWidth: " + croppedImageWidth + ", croppedImageHeight: " + croppedImageHeight + ", destinationX: " + destinationX + ", destinationY: " + destinationY + ", destinationWidth: " + destinationWidth + ", destinationHeight: " + destinationHeight);
 
       // Fill image in dest. rectangle
-      context.drawImage(image, containerX, containerY, containerWidth, containerHeight, startX, startY, width, height);
+      context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, destinationX, destinationY, destinationWidth, destinationHeight);
     },
     getPhonerSize: function(newHeight) {
       var ratio = content.image.width / content.image.height,
@@ -227,22 +231,48 @@ var generator = (function () {
       var file = input.files[0],
           reader = new FileReader(),
           image = new Image(),
+          imageRatio = 0,
+          newImageWidth = 0,
+          newImageHeight = 0,
+          maxPortraitWidth = (settings.width / 2) - (settings.width / 25);
           display = input.parentElement.querySelector("span");
 
       if (file) {
         reader.onload = function(event) {
+          image.onload = function() {
+            imageRatio = this.width / this.height;
+          };
+
           // Must be image.src, see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
           image.src = event.target.result;
-          content.image = image;
         };
-        display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
+
         reader.readAsDataURL(event.target.files[0]);
-        if (actions.matchString(settings.template, "fs_")) _clearInputs();
-        console.log("User image uploaded successfully.");
       }
 
       setTimeout(function() {
-        callback();
+        if (imageRatio > 1 && settings.template == "fs_portrait") {
+          alert("This image is LANDSCAPE-oriented. Please use the fs_landscape template instead.");
+        } else if (imageRatio <= 1 && settings.template == "fs_landscape") {
+          alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
+        } else {
+          content.image = image;
+          display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
+          if (actions.matchString(settings.template, "fs_")) _clearInputs();
+
+          if (settings.template == "fs_portrait") {
+            newImageWidth = imageRatio * image.width;
+            if (newImageWidth >= maxPortraitWidth) document.getElementById("jsAdjustPortrait").classList.remove("generator__fieldset--hidden");
+          }
+
+          if (settings.template == "fs_landscape") {
+            newImageHeight = imageRatio * image.height;
+            if (newImageHeight >= settings.height) document.getElementById("jsAdjustLandscape").classList.remove("generator__fieldset--hidden");
+          }
+
+          console.log("User image uploaded successfully.");
+          callback();
+        }
       }, 200);
     },
     renderArticleHeadline: function() {
@@ -252,20 +282,39 @@ var generator = (function () {
       actions.rotateArticle(-5);
       actions.addRadialGradient();
     },
-    renderPortrait: function(offsetY) {
+    renderPortrait: function(offsetCropX, offsetCropY) {
       var width = settings.width,
           height = settings.height,
           context = settings.context,
-          image = content.image;
+          image = content.image,
+          imageRatio = image.width / image.height,
+          newImageWidth = imageRatio * image.width,
+          maxPortraitWidth = (width / 2) - (width / 25);
+
+      // Most of these defaults are already set in fitImage, but I had to set them here, too, to display in input
+      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
+      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
 
       _clearCanvas();
       context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
-      actions.fitImage(context, image, width, height, 0, 0, 0.5, (offsetY ? offsetY : 0.5)); // Draw background image
+      actions.fitImage(context, image, width, height, 0, 0, null, null); // Draw background image
       context.filter = "none"; // Reset filters so they don't apply to the next image
-      actions.fitImage(context, image, ((width / 2) - (width / 25)), height, (width / 2), 0, 0.5, 0); // Fit foreground image against the half-way point of canvas, crop as portrait
+
+      if (newImageWidth > maxPortraitWidth) {
+        actions.fitImage(context, image, maxPortraitWidth, height, (width / 2), 0, offsetCropX, offsetCropY); // Crop as portrait
+        document.getElementById("jsDisplayXPos").value = offsetCropX * 100;
+      } else {
+        context.drawImage(image, width / 2, 0, newImageWidth, height); // Scale image down without cropping
+      }
     },
-    renderLandscape: function() {
-      actions.fitImage(settings.context, content.image, settings.width, settings.height, 0, 0);
+    renderLandscape: function(offsetCropX, offsetCropY) {
+      // Most of these defaults are already set in fitImage, but I had to set them here, too, to display in input
+      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
+      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
+
+      actions.fitImage(settings.context, content.image, settings.width, settings.height, 0, 0, offsetCropX, offsetCropY);
+      document.getElementById("jsDisplayYPos").value = offsetCropY * 100;
+      // (context, image, destinationWidth, destinationHeight, destinationX, destinationY, offsetCropX, offsetCropY)
     },
     renderLowerThirds: function() {
       var inputsArray = document.querySelectorAll(".js-add-text-group"),
@@ -371,91 +420,135 @@ var generator = (function () {
     var fieldsets = document.querySelectorAll(".generator__fieldset");
 
     fieldsets.forEach(function(fieldset) {
-      var fieldButton = fieldset.querySelector(".generator__button"),
+      var fieldButtons = fieldset.querySelectorAll(".generator__button"),
           fieldInput = fieldset.querySelector("input");
 
-      fieldButton.addEventListener("click", function() {
-        var inputClass = fieldInput.className,
-            inputValue = fieldInput.value;
+      if (fieldButtons.length === 1) {
+        fieldButtons[0].addEventListener("click", function() {
+          var inputClass = fieldInput.className,
+              inputValue = fieldInput.value;
 
-        switch (true) {
-          case actions.matchString(inputClass, "js-add-courtesy"):
-            if (settings.template == "fs_portrait") {
-              actions.renderPortrait();
-            } else if (settings.template == "fs_landscape") {
-              actions.renderLandscape();
-            } else {
-              _clearCanvas();
-              _enableInputs();
-            }
-            actions.addCourtesy(inputValue);
-            break;
-          case actions.matchString(inputClass, "js-add-text-group"):
-            if (settings.template == "l3_gradient") {
-              actions.renderLowerThirds();
-            } else if (settings.template == "l3_phoner") {
-              actions.renderL3_Phoner();
-            }
-            _enableInputs();
-            break;
-          case actions.matchString(inputClass, "js-file-name"):
-            actions.downloadCanvas(fieldInput.value);
-            break;
-          case actions.matchString(inputClass, "js-upload-article"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              actions.readFile(event, fieldInput, actions.renderArticleHeadline);
-              _enableInputs();
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-landscape"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              actions.readFile(event, fieldInput, actions.renderLandscape);
-              _enableInputs();
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-phoner"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              if (settings.template == "l3_gradient") {
-                actions.readFile(event, fieldInput, actions.renderLowerThirds);
-              } else if (settings.template == "l3_phoner") {
-                actions.readFile(event, fieldInput, actions.renderL3_Phoner);
+          switch (true) {
+            case actions.matchString(inputClass, "js-add-courtesy"):
+              if (settings.template == "fs_portrait") {
+                actions.renderPortrait();
+              } else if (settings.template == "fs_landscape") {
+                actions.renderLandscape();
+              } else {
+                _clearCanvas();
+                _enableInputs();
               }
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-portrait"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              actions.readFile(event, fieldInput, actions.renderPortrait);
+              actions.addCourtesy(inputValue);
+              break;
+            case actions.matchString(inputClass, "js-add-text-group"):
+              if (settings.template == "l3_gradient") {
+                actions.renderLowerThirds();
+              } else if (settings.template == "l3_phoner") {
+                actions.renderL3_Phoner();
+              }
               _enableInputs();
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-side-left"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              actions.readFile(event, fieldInput, actions.renderSideLeft);
-            };
-            break;
-          case actions.matchString(inputClass, "js-upload-side-right"):
-            fieldInput.click();
-            fieldInput.onchange = function(event) {
-              event = event || window.event;
-              actions.readFile(event, fieldInput, actions.renderSideRight);
-              _enableInputs();
-            };
-            break;
-          default:
-            console.log("No match found for inputClass.");
-            break;
-        }
-      });
+              break;
+            case actions.matchString(inputClass, "js-file-name"):
+              actions.downloadCanvas(fieldInput.value);
+              break;
+            case actions.matchString(inputClass, "js-upload-article"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                actions.readFile(event, fieldInput, actions.renderArticleHeadline);
+                _enableInputs();
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-landscape"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                actions.readFile(event, fieldInput, actions.renderLandscape);
+                _enableInputs();
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-phoner"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                if (settings.template == "l3_gradient") {
+                  actions.readFile(event, fieldInput, actions.renderLowerThirds);
+                } else if (settings.template == "l3_phoner") {
+                  actions.readFile(event, fieldInput, actions.renderL3_Phoner);
+                }
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-portrait"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                actions.readFile(event, fieldInput, actions.renderPortrait);
+                _enableInputs();
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-side-left"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                actions.readFile(event, fieldInput, actions.renderSideLeft);
+              };
+              break;
+            case actions.matchString(inputClass, "js-upload-side-right"):
+              fieldInput.click();
+              fieldInput.onchange = function(event) {
+                event = event || window.event;
+                actions.readFile(event, fieldInput, actions.renderSideRight);
+                _enableInputs();
+              };
+              break;
+            default:
+              console.log("No match found for inputClass.");
+              break;
+          }
+        });
+      } else {
+        fieldButtons.forEach(function(fieldButton) {
+          var buttonClass = fieldButton.className;
+
+          fieldButton.addEventListener("click", function() {
+            var imagePos = Number(fieldInput.value);
+
+            switch (true) {
+              case actions.matchString(buttonClass, "js-xpos-decrease"):
+                // Get value and if it isn't zero, decrease by 10
+                if (imagePos > 0) {
+                  imagePos -= 10;
+                  actions.renderPortrait(imagePos / 100, null);
+                }
+                break;
+              case actions.matchString(buttonClass, "js-xpos-increase"):
+                // Get value and if it isn't zero, decrease by 10
+                if (imagePos < 100) {
+                  imagePos += 10;
+                  actions.renderPortrait(imagePos / 100, null);
+                }
+                break;
+              case actions.matchString(buttonClass, "js-ypos-decrease"):
+                // Get value and if it isn't zero, decrease by 10
+                if (imagePos > 0) {
+                  imagePos -= 10;
+                  actions.renderLandscape(null, imagePos / 100);
+                }
+                break;
+              case actions.matchString(buttonClass, "js-ypos-increase"):
+                // Get value and if it isn't zero, decrease by 10
+                if (imagePos < 100) {
+                  imagePos += 10;
+                  actions.renderLandscape(null, imagePos / 100);
+                }
+                break;
+              default:
+                console.log("No match found for buttonClass.");
+                break;
+            }
+          });
+        });
+      }
     });
   }
 

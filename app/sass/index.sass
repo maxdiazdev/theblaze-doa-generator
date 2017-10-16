@@ -93,6 +93,31 @@ input[type="text"]
     color: $placeholder-color
     opacity: 1
 
+input[type="number"]
+  -moz-appearance: textfield
+
+  &::-webkit-input-placeholder
+    font-size: $placeholder-size
+    color: $placeholder-color
+
+  &::-moz-placeholder
+    font-size: $placeholder-size
+    color: $placeholder-color
+
+  &:-ms-input-placeholder
+    font-size: $placeholder-size
+    color: $placeholder-color
+
+  &:-moz-placeholder
+    font-size: $placeholder-size
+    color: $placeholder-color
+    opacity: 1
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button,
+    -webkit-appearance: none
+    margin: 0
+
 input[type="range"]
   width: 100%
   -webkit-appearance: none
@@ -235,6 +260,9 @@ img
     &--disabled
       opacity: 0.15
 
+    &--hidden
+      display: none
+
   &__input
     display: block
     width: 100%
@@ -252,7 +280,8 @@ img
       background-color: #ededed
       overflow: hidden
 
-    &--text
+    &--text,
+    &--number
       padding: 12px 15px
       border: 5px solid #ededed
 
@@ -322,3 +351,10 @@ img
   color: $theme-black
   border-color: $theme-black
   background-color: $theme-black
+
+.generator__half-column
+  width: calc(50% - 5px)
+  float: left
+
+  &:first-of-type
+    margin-right: 10px
