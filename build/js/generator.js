@@ -263,12 +263,20 @@ var generator = (function () {
 
           if (settings.template == "fs_portrait") {
             newImageWidth = imageRatio * image.width;
-            if (newImageWidth >= maxPortraitWidth) document.getElementById("jsAdjustPortrait").classList.remove("generator__fieldset--hidden");
+            if (newImageWidth >= maxPortraitWidth) {
+              document.getElementById("jsAdjustPortrait").classList.remove("generator__fieldset--hidden");
+            } else {
+              document.getElementById("jsAdjustPortrait").classList.add("generator__fieldset--hidden");
+            }
           }
 
           if (settings.template == "fs_landscape") {
             newImageHeight = imageRatio * image.height;
-            if (newImageHeight >= settings.height) document.getElementById("jsAdjustLandscape").classList.remove("generator__fieldset--hidden");
+            if (newImageHeight >= settings.height) {
+              document.getElementById("jsAdjustLandscape").classList.remove("generator__fieldset--hidden");
+            } else {
+              document.getElementById("jsAdjustLandscape").classList.add("generator__fieldset--hidden");
+            }
           }
 
           console.log("User image uploaded successfully.");
