@@ -12,7 +12,7 @@ var generator = (function () {
     height: canvas.height,
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
-    font: { family:"\"Helvetica Neue\", \"tex_gyre_heros\", Arial, sans-serif" }
+    font: { family:"\"Helvetica Neue\"" }
   };
 
   var content = {
@@ -162,8 +162,9 @@ var generator = (function () {
     downloadCanvas: function(fileName) {
       if (fileName) {
         canvas.toBlob(function(blob) {
-          settings.template = settings.template.toUpperCase();
-          saveAs(blob, settings.template + "_" + fileName + ".png");
+          // settings.template = settings.template.toUpperCase();
+          // saveAs(blob, settings.template + "_" + fileName + ".png");
+          saveAs(blob, fileName + ".png");
         });
       } else {
         alert("Please enter a file name before downloading.");
@@ -357,10 +358,10 @@ var generator = (function () {
           blankInputs = 0,
           fColor = "",
           startX = 80,
-          startY = 450,
+          startY = 0,
           rectColor = "",
           rectOpacity = 1,
-          padding = { top: 10, right: 60, bottom: 31, left: 25 };
+          padding = { top: 5, right: 40, bottom: 20, left: 20 };
 
       // Check for blankInputs and get totalHeight
       inputsArray.forEach(function(input) {
@@ -373,12 +374,17 @@ var generator = (function () {
         _clearCanvas();
         if (content.image != "No image set.") {
           settings.context.strokeStyle = "white";
-          settings.context.lineWidth = 10;
-          settings.context.strokeRect(startX, startY, 217, 217);
-          actions.fitImage(settings.context, content.image, 217, 217, startX, startY, 0.5, 0);
-          startX += 217 + 20;
+          settings.context.lineWidth = 7;
+          settings.context.strokeRect(startX, 500, 178, 178);
+          actions.fitImage(settings.context, content.image, 178, 178, startX, 500, 0.5, 0);
+          startX += 178 + 20;
         }
+
+        // Draw "On the Phone"
+        actions.drawTextWithRect("On the Phone", 33, 500, "white", startX, 500, "black", rectOpacity, padding);
+
         for (var i = 0; i < inputsArray.length; i++) {
+          /*
           if (i === 0) {
             rectColor = "black";
             fColor = "white";
@@ -386,13 +392,16 @@ var generator = (function () {
             rectColor = "white";
             fColor = "black";
           }
-          if (i === 1) startY = 530;
-          if (i === 2) startY = 600;
+          */
+          rectColor = "white";
+          fColor = "black";
+
+          // if (i === 0) startY = 500;
+          if (i === 0) startY = 565;
+          if (i === 1) startY = 625;
           actions.drawTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), fColor, startX, startY, rectColor, rectOpacity, padding);
         }
       }
-
-      console.log(blankInputs);
     },
     renderSideLeft: function() {
       actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0, 0.5, 0);

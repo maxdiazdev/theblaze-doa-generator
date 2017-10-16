@@ -18,22 +18,22 @@ html(lang="en")
         canvas.generator__canvas(width="1280" height="720" data-template="l3_phoner")
       section.generator__controls
         fieldset.generator__fieldset
-          label.generator__directions Drag and re-order, or remove text as needed.
-          span.generator__label Small Text
-          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="500")
-          span.generator__label Large Text
-          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500")
-          span.generator__label Small Text
-          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
+          label.generator__directions Add phoner's name and their description.
+          //- span.generator__label Small Text
+          //- input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="33" data-font-weight="500")
+          span.generator__label Name
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="600")
+          span.generator__label Description
+          input.js-add-text-group.generator__input.generator__input--text(type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400")
           button.generator__button(type="button") Add Text Group
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Upload a portrait or landscape-oriented phoner.
+          label.generator__directions Upload phoner's photo. Can be portrait or landscape.
           input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none" disabled)
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button" disabled) Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Name your graphic and download.
-          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
+          label.generator__directions Name your file. All files save as .png.
+          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Example: L3-PHONER_John-Smith" disabled)
           button.generator__button(type="button" disabled) Download File
   script(src="js/file-saver.min.js")
   script(src="js/Sortable.min.js")
