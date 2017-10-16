@@ -30,11 +30,11 @@
           <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;" disabled><span class="generator__input generator__input--image">No file uploaded yet.</span>
           <button class="generator__button" type="button" disabled>Choose Image</button>
         </fieldset>
-        <fieldset class="generator__fieldset" id="jsAdjustPhoner">
+        <fieldset class="generator__fieldset generator__fieldset--disabled" id="jsAdjustPhoner">
           <label class="generator__directions">Adjust the photo horizontally, if needed.</label>
           <input class="generator__input generator__input--number" id="jsDisplayYPos" type="number" min="0" max="100" step="10" placeholder="Y Position">
-          <button class="js-ypos-decrease generator__button" type="button">-10%</button>
-          <button class="js-ypos-increase generator__button" type="button">+10%</button>
+          <button class="js-ypos-decrease generator__button" type="button" disabled>-10%</button>
+          <button class="js-ypos-increase generator__button" type="button" disabled>+10%</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled">
           <label class="generator__directions">Name your file. All files save as .png.</label>
