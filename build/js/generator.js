@@ -737,6 +737,7 @@ var generator = (function() {
         } else {
           actions.fitImage(content.imageRight, settings.width / 2, settings.height, settings.width / 2, 0);
           determineAdj(content.imageRight);
+          actions.enableInputs();
         }
 
         function determineAdj(image) {
@@ -746,8 +747,6 @@ var generator = (function() {
             actions.createAdjustment(button.parentElement, "X", {name: "fs-side", value: side});
           }
         }
-
-        actions.enableInputs();
       });
     }
   };
