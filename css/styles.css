@@ -223,6 +223,7 @@ img {
 .generator__button {
   display: inline-block;
   padding: 12px 20px;
+  margin-right: 5px;
   border: none;
   border-radius: 3px;
   background-color: #333333;
@@ -366,6 +367,19 @@ img {
   position: relative;
 }
 
+.js-sortable-move {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  top: 30px;
+  right: 60px;
+  cursor: pointer;
+  background-image: url("../img/icons/icon-move.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .js-sortable-remove {
   width: 30px;
   height: 30px;
@@ -374,15 +388,40 @@ img {
   top: 30px;
   right: 25px;
   cursor: pointer;
-  background-image: url("../img/icons/icon-close.png");
+  background-image: url("../img/icons/icon-remove.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.js-sortable-ghost > * {
+.js-sortable-ghost > .generator__label {
   color: #333333;
+}
+
+.js-sortable-ghost > .generator__input--text {
   border-color: #333333;
   background-color: #333333;
+}
+
+.js-sortable-ghost > .generator__input--text::-webkit-input-placeholder {
+  color: #333333;
+}
+
+.js-sortable-ghost > .generator__input--text::-moz-placeholder {
+  color: #333333;
+}
+
+.js-sortable-ghost > .generator__input--text:-ms-input-placeholder {
+  color: #333333;
+}
+
+.js-sortable-ghost > .generator__input--text:-moz-placeholder {
+  color: #333333;
+  opacity: 1;
+}
+
+.js-sortable-ghost > .js-sortable-move,
+.js-sortable-ghost > .js-sortable-remove {
+  display: none;
 }
 
 .generator__half-column {

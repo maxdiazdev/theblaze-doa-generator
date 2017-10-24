@@ -1,247 +1,367 @@
 // Grab the canvas
-var canvas = document.querySelector(".generator__canvas");
+var canvas = document.getElementById("jsGeneratorCanvas");
 
 // Begin generator module
-var generator = (function () {
+var generator = (function() {
 
-  // Firefox has 6-year-old bug with text alignment: https://github.com/CreateJS/EaselJS/issues/650
+  // Check for Firefox. It has a bug with text alignments: https://github.com/CreateJS/EaselJS/issues/650
   var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
+  // Store canvas attributes
   var settings = {
     width: canvas.width,
     height: canvas.height,
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
-    font: { family:"\"Helvetica Neue\"" }
+    font: "\"Helvetica Neue\""
   };
 
-  var content = {
-    text: "No text set.",
-    image: "No image set."
-  };
+  // Store drawn text or images as needed, throughout the app
+  var content = {};
 
+  // Singular actions (hopefully) that the renders object uses
   var actions = {
+
+    /* ACTIONS: Add Bottom Gradient
+    ====================================== */
     addBottomGradient: function(ratio) {
-      var width = settings.width,
-          height = settings.height,
-          context = settings.context,
-          startX = 0,
-          startY = height,
+      var startX = 0,
+          startY = settings.height,
           endX = 0,
-          endY = height - height * ratio,
-          gradient = context.createLinearGradient(startX, startY, endX, endY);
+          endY = settings.height - settings.height * ratio,
+          gradient = settings.context.createLinearGradient(startX, startY, endX, endY);
 
       gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
       gradient.addColorStop(0.5, "rgba(0, 0, 0, 0.7)");
       gradient.addColorStop(1, "rgba(0, 0, 0 ,0)");
-      context.fillStyle = gradient;
-      context.fillRect(startX, endY, width, height);
+      settings.context.fillStyle = gradient;
+      settings.context.fillRect(startX, endY, settings.width, settings.height);
     },
-    addCourtesy: function(courtesy) {
-      var fSize = 30,
-          fWeight = 500,
-          fColor = "white",
-          startX = 100,
-          startY = 35,
-          rectColor = "black",
-          rectOpacity = 0.5,
-          padding = { top: 7, right: 35, bottom: 21 , left: 18 };
 
-      if (courtesy.length > 0) {
-        actions.drawTextWithRect(courtesy, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, padding);
-      } else {
-        alert("Courtesy field is empty. Please enter text before submitting.");
-      }
+    /* ACTIONS: Add Phoner
+    ====================================== */
+    addPhoner: function(offsetCropX, offsetCropY) {
+      var context = settings.context,
+          startX = 80,
+          startY = 500,
+          squareDimensions = 178;
+
+      context.strokeStyle = "white";
+      context.lineWidth = 7;
+      context.strokeRect(startX, startY, squareDimensions, squareDimensions);
+      actions.fitImage(content.image, squareDimensions, squareDimensions, startX, startY, offsetCropX, offsetCropY);
     },
+
+    /* ACTIONS: Add Radial Gradient
+    ====================================== */
     addRadialGradient: function() {
-      // http://rectangleworld.com/blog/archives/169
-      var canvas = document.createElement("canvas"),
-          context = canvas.getContext("2d"),
-          rectWidth = settings.width,
-          rectHeight = settings.height,
-          rx = rectWidth,
-        	ry = rectHeight,
-        	cx = rectWidth/2,
-        	cy = rectHeight/2,
-        	scaleX = 0,
-        	scaleY = 0,
-        	invScaleX = 0,
-        	invScaleY = 0,
-        	gradient = 0;
+      // Source: http://rectangleworld.com/blog/archives/169
+      var newCanvas = document.createElement("canvas"),
+          newContext = newCanvas.getContext("2d"),
+          rx = settings.width,
+          ry = settings.height,
+          cx = rx/2,
+          cy = ry/2,
+          scaleX = 0,
+          scaleY = 0,
+          invScaleX = 0,
+          invScaleY = 0,
+          gradient = 0;
 
-      canvas.width = settings.width;
-      canvas.height = settings.height;
+      newCanvas.width = rx;
+      newCanvas.height = ry;
 
       if (rx >= ry) {
         scaleX = 1;
         invScaleX = 1;
         scaleY = ry/rx;
         invScaleY = rx/ry;
-        gradient = context.createRadialGradient(cx, cy*invScaleY, 0, cx, cy*invScaleY, rx);
+        gradient = newContext.createRadialGradient(cx, cy*invScaleY, 0, cx, cy*invScaleY, rx);
       } else {
-    		scaleY = 1;
-    		invScaleY = 1;
-    		scaleX = rx/ry;
-    		invScaleX = ry/rx;
-    		gradient = context.createRadialGradient(cx*invScaleX, cy, 0, cx*invScaleX, cy, ry);
-    	}
-
-      context.fillStyle = gradient;
-    	gradient.addColorStop(0.35,"rgba(0, 0, 0 ,0)");
-    	gradient.addColorStop(1,"rgba(0, 0, 0, 0.8)");
-      context.setTransform(1,0,0,scaleY,0,0);
-      context.fillRect(0,0,rectWidth*invScaleX,rectHeight*invScaleY);
-      settings.context.drawImage(canvas, 0, 0);
-
-    },
-    drawText: function(string, fSize, fWeight, startX, startY) {
-      var font = settings.font,
-          context = settings.context,
-          socialIcon = new Image(),
-          marginOfErr = 9;
-
-      font.size = fSize;
-      font.weight = fWeight;
-
-      if (actions.matchString(string, "facebook")) {
-        socialIcon.src = "img/icons/icon-facebook.png";
-        if (actions.matchString(string, "@facebook")) string = string.replace("facebook ", "");
-      } else if (actions.matchString(string, "instagram")) {
-        socialIcon.src = "img/icons/icon-instagram.png";
-        if (actions.matchString(string, "@instagram")) string = string.replace("instagram ", "");
-      } else if (actions.matchString(string, "twitter")) {
-        socialIcon.src = "img/icons/icon-twitter.png";
-        if (actions.matchString(string, "@twitter")) string = string.replace("twitter ", "");
-      } else {
-       socialIcon = false;
+        scaleY = 1;
+        invScaleY = 1;
+        scaleX = rx/ry;
+        invScaleX = ry/rx;
+        gradient = newContext.createRadialGradient(cx*invScaleX, cy, 0, cx*invScaleX, cy, ry);
       }
 
-      if (string.length > 0) {
-        context.font = font.weight + " " + font.size + "px " + font.family;
-        context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
-        context.fillStyle = "white";
+      newContext.fillStyle = gradient;
+      gradient.addColorStop(0.35,"rgba(0, 0, 0 ,0)");
+      gradient.addColorStop(1,"rgba(0, 0, 0, 0.8)");
+      newContext.setTransform(1,0,0,scaleY,0,0);
+      newContext.fillRect(0,0,rx*invScaleX,ry*invScaleY);
+      settings.context.drawImage(newCanvas, 0, 0);
+    },
 
-        if (socialIcon) {
-          socialIcon.onload = function () {
-            context.drawImage(socialIcon, startX, startY, (fSize - marginOfErr), (fSize - marginOfErr));
+    /* ACTIONS: Add Text
+    ====================================== */
+    addText: function(string, fSize, fWeight, fColor, startX, startY) {
+      var fFamily = settings.font,
+          context = settings.context,
+          social = actions.checkSocial(string);
+
+      if (string.length > 0) {
+        context.font = fWeight + " " + fSize + "px " + fFamily;
+        context.textBaseline = "hanging"; // Ensures letters render from the startY position downward
+        context.fillStyle = fColor;
+
+        if (social) {
+          social.image.onload = function() {
+            var marginOfErr = 9,
+                squareDimensions = fSize - marginOfErr,
+                marginRight = 42;
+
+            context.drawImage(social.image, startX, startY, squareDimensions, squareDimensions);
+            context.fillText(social.handle, (startX + marginRight), startY);
           };
-          context.fillText(string, (startX + 42), startY);
         } else {
           context.fillText(string, startX, startY);
         }
       }
     },
-    drawTextWithRect: function(text, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, padding) {
+
+    /* ACTIONS: Add Text with Rectangle
+    ====================================== */
+    addTextWithRect: function(string, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, rectPadding) {
+      // Source: https://stackoverflow.com/questions/18900117/write-text-on-canvas-with-background
       var context = settings.context,
-          font = settings.font;
+          fFamily = settings.font,
+          rectWidth = "",
+          rectHeight = fSize + rectPadding.bottom,
+          social = actions.checkSocial(string),
+          socialDimensions = fSize - 8,
+          marginRight = 10;
 
-      font.size = fSize;
-      font.weight = fWeight;
-
-      context.font = font.weight + " " + font.size + "px " + font.family; // Set font properly
-      context.textBaseline = "top"; // Draw text from top - makes life easier at the moment
+      context.font = fWeight + " " + fSize + "px " + fFamily;
+      context.textBaseline = "top";
       context.fillStyle = rectColor;
 
-      // Get width and height of rectangle using text size
-      var rectWidth = context.measureText(text).width;
-      var rectHeight = font.size;
+      if (social) {
+        string = social.handle;
+        rectWidth = socialDimensions + marginRight;
+      }
+
+      // Set after context.font so string width is measured accurately
+      rectWidth += context.measureText(string).width + rectPadding.right;
+
+      // Assume these values represent a courtesy
+      if (fSize == 30 && rectOpacity == 0.5) {
+        // Save the courtesy's destination before it is drawn! That way we can erase it without clearing the entire canvas.
+        actions.saveCourtesyArea(rectWidth, rectHeight);
+      }
 
       if (rectOpacity) context.globalAlpha = rectOpacity;
-
-      context.fillRect(startX, startY, (rectWidth + padding.right), (rectHeight + padding.bottom));
-      context.globalAlpha = 1.0; // Reset opacity for future drawings
+      context.fillRect(startX, startY, rectWidth, rectHeight);
+      context.globalAlpha = 1.0; // Reset opacity
       context.fillStyle = fColor;
 
       if (isFirefox) {
         startY += 5;
-        console.log("Firefox detected. This browser has textBaseline issues. startY was adjusted to: " + startY);
+        console.log("Firefox detected. startY was adjusted to " + startY + " to compensate for textBaseline bug");
       }
 
-      context.fillText(text, (startX + padding.left), (startY + padding.top));
-    },
-    downloadCanvas: function(fileName) {
-      if (fileName) {
-        canvas.toBlob(function(blob) {
-          // settings.template = settings.template.toUpperCase();
-          // saveAs(blob, settings.template + "_" + fileName + ".png");
-          saveAs(blob, fileName + ".png");
-        });
+      if (social) {
+        social.image.onload = function() {
+          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + 7), socialDimensions, socialDimensions);
+        };
+      }
+
+      if (social) {
+        context.fillText(string, (startX + socialDimensions + rectPadding.left + marginRight), (startY + rectPadding.top));
       } else {
-        alert("Please enter a file name before downloading.");
+        context.fillText(string, (startX + rectPadding.left), (startY + rectPadding.top));
       }
     },
-    fitImage: function(context, image, destinationWidth, destinationHeight, destinationX, destinationY, offsetCropX, offsetCropY) {
 
-      // Default offset is center
-      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
-      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
+    /* ACTIONS: Check for Blank Inputs
+    ====================================== */
+    checkBlankInputs: function(inputsArray) {
+      var blankInputs = 0;
+      inputsArray.forEach(function(input) {
+        if (!input.value) blankInputs++;
+      });
+      return blankInputs;
+    },
 
-      // console.log("fitImage: " + offsetCropX + ", " + offsetCropY);
+    /* ACTIONS: Check for Social Media
+    ====================================== */
+    checkSocial: function(string) {
+      var social = {
+        image: new Image(),
+        handle: ""
+      };
 
-      // Keep bounds [0.0, 1.0]
-      if (offsetCropX < 0) offsetCropX = 0;
-      if (offsetCropY < 0) offsetCropY = 0;
-      if (offsetCropX > 1) offsetCropX = 1;
-      if (offsetCropY > 1) offsetCropY = 1;
+      string.toLowerCase();
+      switch (typeof string === "string") {
+        case string.includes("@facebook"):
+          social.image.src = "img/icons/icon-facebook.png";
+          social.handle = string.replace("facebook ", "");
+          break;
+        case string.includes("@twitter"):
+          social.image.src = "img/icons/icon-twitter.png";
+          social.handle = string.replace("twitter ", "");
+          break;
+        case string.includes("@instagram"):
+          social.image.src = "img/icons/icon-instagram.png";
+          social.handle = string.replace("instagram ", "");
+          break;
+        default:
+          social = false;
+          break;
+      }
 
-      var imageWidth = image.width,
-          imageHeight = image.height,
-          canvasRatio = Math.min(destinationWidth / imageWidth, destinationHeight / imageHeight),
-          newImageWidth = imageWidth * canvasRatio,   // New width of scaled up image
-          newImageHeight = imageHeight * canvasRatio,   // New height of scaled up image
+      return social;
+    },
+
+    /* ACTIONS: Clear Canvas
+    ====================================== */
+    clearCanvas: function() {
+      settings.context.clearRect(0, 0, settings.width, settings.height);
+      settings.context.beginPath(); // Essential to clear rectangles, images, etc.
+    },
+
+    /* ACTIONS: Clear Inputs
+    ====================================== */
+    clearInputs: function() {
+      var allInputs = document.querySelectorAll("input");
+
+      allInputs.forEach(function(input) {
+        input.value = "";
+      });
+    },
+
+    /* ACTIONS: Create Adjustment Fieldset
+    ====================================== */
+    createAdjustment: function(fileFieldset, axisLetter, buttonAttr) {
+      var posFieldset = document.createElement("fieldset"),
+          axisName = (axisLetter == "X" ? "horizontally" : "vertically");
+
+      posFieldset.className = "generator__fieldset";
+      posFieldset.className += " js-generator-pos-fieldset"; // Used for removeAdjustment function. Must include space!
+
+      if (buttonAttr) {
+        buttonAttr = "data-" + buttonAttr.name + "='" + buttonAttr.value + "'";
+
+        posFieldset.innerHTML = "<label class=\"generator__directions\">Adjust the photo " + axisName + ", if needed.</label><input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\"/><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\" " + buttonAttr + ">-10%</button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\" " + buttonAttr + ">+10%</button>";
+      } else {
+        posFieldset.innerHTML = "<label class=\"generator__directions\">Adjust the photo " + axisName + ", if needed.</label><input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\"/><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\">-10%</button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\">+10%</button>";
+      }
+
+      insertAfter(posFieldset, fileFieldset);
+
+      // Source: https://stackoverflow.com/questions/4793604/how-to-insert-an-element-after-another-element-in-javascript-without-using-a-lib
+      function insertAfter(newNode, referenceNode) {
+        referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+      }
+    },
+
+    /* ACTIONS: Enable Inputs
+    ====================================== */
+    enableInputs: function() {
+      var disabledField = document.querySelectorAll(".generator__fieldset--disabled");
+
+      disabledField.forEach(function(field) {
+        var children = field.children;
+        field.classList.remove("generator__fieldset--disabled");
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") children[i].disabled = false;
+        }
+      });
+    },
+
+    /* ACTIONS: Fit Image
+    ====================================== */
+    fitImage: function(image, dWidth, dHeight, startX, startY, offsetCropX, offsetCropY) {
+      // Source: https://stackoverflow.com/questions/21961839/simulation-background-size-cover-in-canvas
+
+      var context = settings.context,
+          highestRatio = 0,
+          newImageWidth = 0,
+          newImageHeight = 0,
           croppedAtX, subRectY, subRectWidth, subRectHeight, aspectRatio = 1;
 
-      // Decide which gap to fill
-      if (newImageWidth < destinationWidth) aspectRatio = destinationWidth / newImageWidth;
-      if (Math.abs(aspectRatio - 1) < 1e-14 && newImageHeight < destinationHeight) aspectRatio = destinationHeight / newImageHeight;
-      newImageWidth *= aspectRatio;
-      newImageHeight *= aspectRatio;
+      if (image != null) {
 
-      // Calc source rectangle
-      croppedImageWidth = imageWidth / (newImageWidth / destinationWidth);
-      croppedImageHeight = imageHeight / (newImageHeight / destinationHeight);
+        // If only image is provided, default destination is top-left corner of canvas
+        if (arguments.length === 1) {
+          dWidth = settings.width;
+          dHeight = settings.height;
+          startX = 0;
+          startY = 0;
+        }
 
-      croppedAtX = (imageWidth - croppedImageWidth) * offsetCropX;
-      croppedAtY = (imageHeight - croppedImageHeight) * offsetCropY;
+        // Default offset is center
+        offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
+        offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
 
-      // Make sure source rectangle is valid
-      if (croppedAtX < 0) croppedAtX = 0;
-      if (croppedAtY < 0) croppedAtY = 0;
-      if (croppedImageWidth > imageWidth) croppedImageWidth = imageWidth;
-      if (croppedImageHeight > imageHeight) croppedImageHeight = imageHeight;
+        // Keep bounds [0.0, 1.0]
+        if (offsetCropX < 0) offsetCropX = 0;
+        if (offsetCropY < 0) offsetCropY = 0;
+        if (offsetCropX > 1) offsetCropX = 1;
+        if (offsetCropY > 1) offsetCropY = 1;
 
-      // console.log("image: " + newImageWidth + ", " + newImageHeight);
-      // console.log("[imageData], " + "croppedAtX: " + croppedAtX + ", croppedAtY: " + croppedAtY + ", croppedImageWidth: " + croppedImageWidth + ", croppedImageHeight: " + croppedImageHeight + ", destinationX: " + destinationX + ", destinationY: " + destinationY + ", destinationWidth: " + destinationWidth + ", destinationHeight: " + destinationHeight);
+        highestRatio = Math.min(dWidth / image.width, dHeight / image.height);
+        newImageWidth = image.width * highestRatio;
+        newImageHeight = image.height * highestRatio;
 
-      // Fill image in dest. rectangle
-      context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, destinationX, destinationY, destinationWidth, destinationHeight);
+        // Decide which gap to fill
+        if (newImageWidth < dWidth) aspectRatio = dWidth / newImageWidth;
+        if (Math.abs(aspectRatio - 1) < 1e-14 && newImageHeight < dHeight) aspectRatio = dHeight / newImageHeight;
+
+        newImageWidth *= aspectRatio;
+        newImageHeight *= aspectRatio;
+
+        // Calc source rectangle
+        croppedImageWidth = image.width / (newImageWidth / dWidth);
+        croppedImageHeight = image.height / (newImageHeight / dHeight);
+        croppedAtX = (image.width - croppedImageWidth) * offsetCropX;
+        croppedAtY = (image.height - croppedImageHeight) * offsetCropY;
+
+        // Make sure source rectangle is valid
+        if (croppedAtX < 0) croppedAtX = 0;
+        if (croppedAtY < 0) croppedAtY = 0;
+        if (croppedImageWidth > image.width) croppedImageWidth = image.width;
+        if (croppedImageHeight > image.height) croppedImageHeight = image.height;
+
+        // Fill image in dest. rectangle
+        context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, startX, startY, dWidth, dHeight);
+
+        // NOTE: Check for display inputs, and show corresponding pos
+      } else {
+        console.log("No image passed to fitImage.");
+      }
     },
-    getPhonerSize: function(newHeight) {
-      var ratio = content.image.width / content.image.height,
-          newWidth = Math.round(newHeight * ratio);
 
-      content.image.width = newWidth;
-      content.image.height = newHeight;
-      console.log("Phoner dimensions are: " + newWidth + ", " + newHeight);
+    /* ACTIONS: Get Input
+    ====================================== */
+    getFile: function(input, callback) {
+      input.click();
+      input.onchange = function(event) {
+        event = event || window.event; // Cross-browser compatibility
+        actions.readFile(event, input, callback);
+      };
     },
-    matchString: function(search, find) {
-      // search.toLowerCase();
-      return search.includes(find);
+
+    /* ACTIONS: Get Input
+    ====================================== */
+    getInput: function(button) {
+      parent = button.parentElement;
+      input = parent.querySelector("input");
+      return input;
     },
+
+    /* ACTIONS: Read File
+    ====================================== */
     readFile: function(event, input, callback) {
       var file = input.files[0],
           reader = new FileReader(),
           image = new Image(),
-          imageRatio = 0,
-          newImageWidth = 0,
-          newImageHeight = 0,
-          maxPortraitWidth = (settings.width / 2) - (settings.width / 25);
           display = input.parentElement.querySelector("span");
 
       if (file) {
         reader.onload = function(event) {
           image.onload = function() {
-            imageRatio = this.width / this.height;
+            console.log("image.width: " + image.width + ", image.height: " + image.height);
           };
 
           // Must be image.src, see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
@@ -249,400 +369,388 @@ var generator = (function () {
         };
 
         reader.readAsDataURL(event.target.files[0]);
-      }
-
-      setTimeout(function() {
-        if (imageRatio > 1 && settings.template == "fs_portrait") {
-          alert("This image is LANDSCAPE-oriented. Please use the fs_landscape template instead.");
-        } else if (imageRatio <= 1 && settings.template == "fs_landscape") {
-          alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
-        } else {
-          content.image = image;
+        setTimeout(function() {
+          var button = input.parentElement.querySelector("button");
+          if (settings.template == "fs_side-by-side") {
+            console.log("FS_SIDE-BY-SIDE");
+            if (button.dataset.fsSide == "left") {
+              content.imageLeft = image;
+              content.imageLeft.ratio = image.width / image.height;
+            } else {
+              content.imageRight = image;
+              content.imageRight.ratio = image.width / image.height;
+            }
+            console.log(content.imageLeft + ", " + content.imageRight);
+          } else {
+            content.image = image;
+            content.image.ratio = image.width / image.height;
+          }
           display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
-          if (actions.matchString(settings.template, "fs_")) _clearInputs();
-
-          if (settings.template == "fs_portrait") {
-            newImageWidth = imageRatio * settings.height;
-            // newImageHeight = imageRatio * image.height; // Different than above, because we want to see what the scaled-up height of the image is
-
-            if (newImageWidth >= maxPortraitWidth) {
-              document.getElementById("jsAdjustPortrait").classList.remove("generator__fieldset--hidden");
-            } else {
-              document.getElementById("jsAdjustPortrait").classList.add("generator__fieldset--hidden");
-            }
-
-            console.log("newImageWidth: " + newImageWidth);
-          }
-
-          if (settings.template == "fs_landscape") {
-            newImageHeight = imageRatio * settings.width;
-
-            if (imageRatio != settings.width / settings.height && newImageHeight > settings.height) {
-              document.getElementById("jsAdjustLandscape").classList.remove("generator__fieldset--hidden");
-            } else {
-              document.getElementById("jsAdjustLandscape").classList.add("generator__fieldset--hidden");
-            }
-
-            console.log("imageRatio: " + imageRatio + ", canvasRatio: " + settings.width / settings.height);
-          }
-
-          console.log("User image uploaded successfully.");
           callback();
-        }
-      }, 200);
-    },
-    renderArticleHeadline: function() {
-      _clearCanvas();
-      settings.context.fillStyle = "white";
-      settings.context.fillRect(0, 0, settings.width, settings.height);
-      actions.rotateArticle(-5);
-      actions.addRadialGradient();
-    },
-    renderPortrait: function(offsetCropX, offsetCropY) {
-      var width = settings.width,
-          height = settings.height,
-          context = settings.context,
-          image = content.image,
-          imageRatio = image.width / image.height,
-          maxPortraitWidth = (width / 2) - (width / 25),
-          newImageWidth = imageRatio * height;
-
-      // Most of these defaults are already set in fitImage, but I had to set them here, too, to display in input
-      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
-      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
-
-      _clearCanvas();
-      context.filter = "grayscale(100%) brightness(50%) blur(5px)"; // Apply filters to background image
-      actions.fitImage(context, image, width, height, 0, 0, null, null); // Draw background image
-      context.filter = "none"; // Reset filters so they don't apply to the next image
-
-      if (newImageWidth > maxPortraitWidth) {
-        actions.fitImage(context, image, maxPortraitWidth, height, (width / 2), 0, offsetCropX, offsetCropY); // Crop as portrait
-        document.getElementById("jsDisplayXPos").value = offsetCropX * 100;
-      } else {
-        context.drawImage(image, width / 2, 0, newImageWidth, height); // Scale image down without cropping
+        }, 200);
       }
     },
-    renderLandscape: function(offsetCropX, offsetCropY) {
-      // Most of these defaults are already set in fitImage, but I had to set them here, too, to display in input
-      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
-      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
 
-      actions.fitImage(settings.context, content.image, settings.width, settings.height, 0, 0, offsetCropX, offsetCropY);
-      document.getElementById("jsDisplayYPos").value = offsetCropY * 100;
-      // (context, image, destinationWidth, destinationHeight, destinationX, destinationY, offsetCropX, offsetCropY)
+    /* ACTIONS: Remove Adjustment Fieldsets
+    ====================================== */
+    removeAdjustment: function(fileFieldset) {
+      var sibling = fileFieldset.nextElementSibling;
+      if (sibling.classList.contains("js-generator-pos-fieldset")) sibling.remove();
     },
-    renderLowerThirds: function() {
-      var inputsArray = document.querySelectorAll(".js-add-text-group"),
-          blankInputs = 0,
-          totalHeight = 0,
+
+    /* ACTIONS: Restore Courtesy Area
+    ====================================== */
+    restoreCourtesyArea: function() {
+      var startX = 100,
+          startY = 35;
+
+      settings.context.putImageData(content.slice, startX, startY);
+    },
+
+    /* ACTIONS: Rotate Image
+    ====================================== */
+    rotateImage: function(degrees) {
+      var newCanvas = document.createElement("canvas"),
+          newContext = newCanvas.getContext("2d");
+
+      newCanvas.width = settings.width;
+      newCanvas.height = settings.height;
+
+      newContext.save(); // Save unrotated phantom canvas
+      newContext.rotate(degrees*Math.PI/180);
+      newContext.translate(-30, 50);
+      settings.context = newContext; // Ensure fitImage uses phantom context
+      actions.fitImage(content.image);
+      settings.context = canvas.getContext("2d"); // Reset context back to original canvas
+      settings.context.drawImage(newCanvas, 0, 0);
+      newContext.restore(); // Restore unrotated phantom canvas for future use
+    },
+
+    /* ACTIONS: Save Courtesy Area
+    ====================================== */
+    saveCourtesyArea: function(rectWidth, rectHeight) {
+      // Source: https://www.w3schools.com/tags/canvas_getimagedata.asp
+      var startX = 100,
+          startY = 35,
+          marginOfErr = 10; // Occasionally, courtesy will leave behind a few pixels of previous rectangle
+
+      content.slice = settings.context.getImageData(startX, startY, rectWidth + marginOfErr, rectHeight);
+    },
+
+    /* ACTIONS: Set Sortables
+    ====================================== */
+    setSortables: function() {
+      // Source: https://github.com/RubaXa/Sortable
+      var sortParent = document.getElementById("jsSortable");
+
+      if (sortParent) {
+        var sortable = Sortable.create(sortParent, {
+          draggable: ".js-sortable-item", // must include the dot
+          dragClass: "js-sortable-drag",
+          ghostClass: "js-sortable-ghost",
+          chosenClass: "js-sortable-chosen",
+          handle: ".js-sortable-move", // must include the dot
+          filter: ".js-sortable-remove", // must include the dot
+          onFilter: function(event) {
+            var item = event.item,
+                control = event.target;
+
+            if (Sortable.utils.is(control, ".js-sortable-remove")) {
+              item.parentNode.removeChild(item);
+            }
+          }
+        });
+      } else {
+        console.log("No sortable items found.");
+      }
+    }
+  };
+
+  // Collection of actions to accomplish a render / template
+  var render = {
+
+    /* RENDER: Adjust image... It should be in actions, but we need to access it publicly.
+    ====================================== */
+    adjustImg: function(button, axisLetter, direction) {
+      var input = actions.getInput(button);
+          value = Number(input.value);
+
+      if (direction == "decrease" && value > 0) {
+        value -= 10;
+        input.value = value;
+      } else if (direction == "increase" && value < 100) {
+        value += 10;
+        input.value = value;
+      }
+
+      // Change value to decimal for fitImage function
+      value /= 100;
+
+      // Use core render functions to redraw images according to their axis
+      if (axisLetter == "X") {
+        if (settings.template == "fs_portrait") actions.fitImage(content.image, (settings.width / 2 - settings.width / 25), settings.height, (settings.width / 2), 0, value, 0.5);
+
+        if (settings.template == "fs_side-by-side" && button.dataset.fsSide == "left") {
+          actions.fitImage(content.imageLeft, settings.width / 2, settings.height, 0, 0, value, 0.5);
+        } else if (settings.template == "fs_side-by-side" && button.dataset.fsSide == "right") {
+          actions.fitImage(content.imageRight, settings.width / 2, settings.height, settings.width / 2, 0, value, 0.5);
+        }
+      } else {
+        if (settings.template == "fs_landscape") {
+          actions.fitImage(content.image, settings.width, settings.height, 0, 0, 0.5, value);
+          if (content.courtesy != null) actions.addTextWithRect(content.courtesy, 30, 500, "white", 100, 35, "black", 0.5, { top: 7, right: 35, bottom: 21, left: 18});
+        }
+
+        if (settings.template == "fs_side-by-side" && button.dataset.fsSide == "left") {
+          actions.fitImage(content.imageLeft, settings.width / 2, settings.height, 0, 0, 0.5, value);
+        } else if (settings.template == "fs_side-by-side" && button.dataset.fsSide == "right") {
+          actions.fitImage(content.imageRight, settings.width / 2, settings.height, settings.width / 2, 0, 0.5, value);
+        }
+
+        if (settings.template == "l3_phoner") actions.fitImage(content.image, 178, 178, 80, 500, 0.5, value);
+      }
+    },
+
+    /* RENDER: Article
+    ====================================== */
+    article: function(button) {
+      var input = actions.getInput(button);
+      actions.getFile(input, function() {
+        if (content.image.ratio > 1) {
+          settings.context.fillStyle = "white";
+          settings.context.fillRect(0, 0, settings.width, settings.height);
+          actions.rotateImage(-5);
+          actions.addRadialGradient();
+          actions.enableInputs();
+        } else {
+          alert("This image is PORTRAIT-oriented. Please submit a different screenshot.");
+        }
+      });
+    },
+
+    /* RENDER: Courtesy
+    ====================================== */
+    courtesy: function(button) {
+      var courtesy = actions.getInput(button).value,
+          fSize = 30,
+          fWeight = 500,
+          fColor = "white",
+          startX = 100,
+          startY = 35,
+          rectColor = "black",
+          rectOpacity = 0.5,
+          rectPadding = {
+            top: 7,
+            right: 35,
+            bottom: 21,
+            left: 18
+          };
+
+      if (courtesy.length > 0) {
+        if (content.slice) actions.restoreCourtesyArea();
+        if (settings.template == "fs_landscape") content.courtesy = courtesy; // adjustImg function redraws the courtesy from scratch after moving fs_landscape background up or down. We can't use content.slice in this situation because it wouldn't match the background after its been moved.
+        actions.addTextWithRect(courtesy, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, rectPadding);
+        if (settings.template == "courtesy") actions.enableInputs();
+      } else {
+        alert("Courtesy field is empty. Please enter text before submitting.");
+      }
+    },
+
+    /* RENDER: Download canvas... It should be in actions, but we need to access it publicly.
+    ====================================== */
+    download: function(button) {
+      var fileName = actions.getInput(button).value;
+
+      if (fileName) {
+        canvas.toBlob(function(blob) {
+          saveAs(blob, fileName + ".png");
+        });
+      } else {
+        alert("Please enter a file name before downloading.");
+      }
+    },
+
+    /* RENDER: Landscape
+    ====================================== */
+    landscape: function(button) {
+      var input = actions.getInput(button);
+      actions.getFile(input, function() {
+        if (content.image.ratio > 1) {
+          actions.clearCanvas();
+          actions.removeAdjustment(button.parentElement);
+          actions.clearInputs();
+          content.slice = null; // Reset courtesy slices
+
+          actions.fitImage(content.image);
+          if (content.image.ratio != settings.width / settings.height) actions.createAdjustment(button.parentElement, "Y");
+          actions.enableInputs();
+        } else {
+          alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
+        }
+      });
+    },
+
+    /* RENDER: L3 Gradient
+    ====================================== */
+    l3_gradient: function(button) {
+      var inputsArray = button.parentElement.querySelectorAll("input"),
+          blankInputs = actions.checkBlankInputs(inputsArray),
           startX = 80,
           startY = 720,
           marginTop = 5;
 
-      // Check for blankInputs and get totalHeight
+      // Calculate how far up the text group needs to be drawn from the bottom of the canvas
       inputsArray.forEach(function(input) {
         var fSize = Number(input.dataset.fontSize);
-        if (!input.value) blankInputs++;
-        totalHeight += fSize;
         startY -= fSize + marginTop;
       });
 
+      // Add padding between bottom edge of text group and bottom edge of canvas
       startY -= 40;
-      console.log(startY);
 
-      // If no blankInputs, then get then render inputs using their data-attributes
       if (blankInputs > 0) {
         alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
       } else {
-        _clearCanvas();
+        actions.clearCanvas();
         actions.addBottomGradient(1/3);
-        if (content.image != "No image set.") {
-          actions.getPhonerSize(totalHeight);
-          settings.context.drawImage(content.image, startX, startY, content.image.width, content.image.height);
-          startX += content.image.width + 20;
-        }
-        for (var i = 0; i < inputsArray.length; i++) {
-          actions.drawText(inputsArray[i].value, inputsArray[i].dataset.fontSize, inputsArray[i].dataset.fontWeight, startX, startY);
-          startY += Number(inputsArray[i].dataset.fontSize) + marginTop;
-        }
+        inputsArray.forEach(function(input) {
+          actions.addText(input.value, input.dataset.fontSize, input.dataset.fontWeight, "white", startX, startY);
+          startY += Number(input.dataset.fontSize) + marginTop;
+          // NOTE: Figure out how to combine the two forEach loops above
+        });
+        actions.enableInputs();
       }
     },
-    renderL3_Phoner: function(offsetCropX, offsetCropY) {
-      var inputsArray = document.querySelectorAll(".js-add-text-group"),
-          blankInputs = 0,
-          fColor = "",
+
+    /* RENDER: L3 Phoner
+    ====================================== */
+    l3_phoner: function(button) {
+      var input = actions.getInput(button),
           startX = 80,
-          startY = 0,
-          rectColor = "",
+          startY = 500,
+          squareDimensions = 178,
+          marginRight = 20,
           rectOpacity = 1,
-          padding = { top: 5, right: 40, bottom: 20, left: 20 };
+          rectPadding = {
+            top: 5,
+            right: 40,
+            bottom: 20,
+            left: 20
+          };
 
-      offsetCropX = typeof offsetCropX === "number" ? offsetCropX : 0.5;
-      offsetCropY = typeof offsetCropY === "number" ? offsetCropY : 0.5;
+      if (input.type == "file") {
+        actions.getFile(input, function() {
+          if (content.image.ratio <= 1) {
+            actions.clearCanvas();
+            actions.removeAdjustment(button.parentElement);
+            actions.clearInputs();
 
-      // Check for blankInputs and get totalHeight
-      inputsArray.forEach(function(input) {
-        if (!input.value) blankInputs++;
-      });
+            // Deletes phoner image previously drawn, leaving behind transparent canvas
+            settings.context.clearRect(startX, startY, squareDimensions, squareDimensions);
 
-      if (blankInputs > 0) {
-        alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
-      } else {
-        _clearCanvas();
-        if (content.image != "No image set.") {
-          settings.context.strokeStyle = "white";
-          settings.context.lineWidth = 7;
-          settings.context.strokeRect(startX, 500, 178, 178);
-          actions.fitImage(settings.context, content.image, 178, 178, startX, 500, offsetCropX, offsetCropY);
-          document.getElementById("jsDisplayYPos").value = offsetCropY * 100;
-          startX += 178 + 20;
-        }
+            // White border
+            settings.context.strokeStyle = "white";
+            settings.context.lineWidth = 7;
+            settings.context.strokeRect(startX, startY, squareDimensions, squareDimensions);
 
-        // Draw "On the Phone"
-        actions.drawTextWithRect("On the Phone", 33, 500, "white", startX, 500, "black", rectOpacity, padding);
+            // Cropped foreground image
+            actions.fitImage(content.image, squareDimensions, squareDimensions, startX, startY);
 
-        for (var i = 0; i < inputsArray.length; i++) {
-          /*
-          if (i === 0) {
-            rectColor = "black";
-            fColor = "white";
+            // Don't present adjustment to square images – they already fit perfectly
+            if (content.image.ratio !== 1) actions.createAdjustment(button.parentElement, "Y");
+
+            actions.enableInputs();
+
+            // NOTE: What about situation where image size is 1188 x 1189?
           } else {
-            rectColor = "white";
-            fColor = "black";
+            alert("This image is LANDSCAPE-oriented. Please submit a different photo.");
           }
-          */
-          rectColor = "white";
-          fColor = "black";
+        });
+      } else {
+        var inputsArray = button.parentElement.querySelectorAll("input"),
+            blankInputs = actions.checkBlankInputs(inputsArray);
 
-          // if (i === 0) startY = 500;
-          if (i === 0) startY = 565;
-          if (i === 1) startY = 625;
-          actions.drawTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), fColor, startX, startY, rectColor, rectOpacity, padding);
+        if (blankInputs > 0) {
+          alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
+        } else {
+          // Draw "On the Phone"
+          if (content.image != null) startX += squareDimensions + marginRight;
+          settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes phoner text previously drawn, leaving behind transparent canvas
+          actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
+
+          // Draw rest of text
+          inputsArray.forEach(function(input) {
+            startY += 60;
+            actions.addTextWithRect(input.value, Number(input.dataset.fontSize), Number(input.dataset.fontWeight), "black", startX, startY, "white", rectOpacity, rectPadding);
+          });
         }
       }
     },
-    renderSideLeft: function() {
-      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, 0, 0, 0.5, 0);
-    },
-    renderSideRight: function() {
-      actions.fitImage(settings.context, content.image, settings.width / 2, settings.height, settings.width / 2, 0, 0.5, 0);
-    },
-    rotateArticle: function(degrees) {
-      var canvas = document.createElement("canvas"),
-          context = canvas.getContext("2d");
 
-      canvas.width = settings.width;
-      canvas.height = settings.height;
+    /* RENDER: Portrait
+    ====================================== */
+    portrait: function(button) {
+      var input = actions.getInput(button);
+      actions.getFile(input, function() {
+        var maxWidth = (settings.width / 2) - (settings.width / 25),
+            newImageWidth = content.image.ratio * settings.height;
 
-      context.save(); // Save the unrotated context of the canvas so we can restore it later
-      context.rotate(degrees*Math.PI/180);
-      context.translate(-30, 50);
-      actions.fitImage(context, content.image, settings.width, settings.height, 0, 0);
-      settings.context.drawImage(canvas, 0, 0);
-      context.restore(); // We’re done with the rotating so restore the unrotated context
+        if (content.image.ratio <= 1) {
+          actions.clearCanvas();
+          actions.removeAdjustment(button.parentElement);
+          actions.clearInputs();
+          content.slice = null; // Reset courtesy slices
+
+          // Background image
+          settings.context.filter = "grayscale(100%) brightness(50%) blur(5px)";
+          actions.fitImage(content.image);
+
+          // Foreground image
+          settings.context.filter = "none";
+          if (newImageWidth > maxWidth) {
+            actions.fitImage(content.image, maxWidth, settings.height, (settings.width / 2), 0);
+            actions.createAdjustment(button.parentElement, "X");
+          } else {
+            settings.context.drawImage(content.image, settings.width / 2, 0, newImageWidth, settings.height);
+          }
+
+          actions.enableInputs();
+        } else {
+          alert("This image is LANDSCAPE-oriented. Please use the fs_landscape template instead.");
+        }
+      });
+    },
+
+    /* RENDER: Side-by-side
+    ====================================== */
+    sideBySide: function(button) {
+      var input = actions.getInput(button),
+          side = button.dataset.fsSide;
+
+      actions.getFile(input, function() {
+        actions.removeAdjustment(button.parentElement);
+
+        if (side == "left") {
+          actions.fitImage(content.imageLeft, settings.width / 2, settings.height, 0, 0);
+          determineAdj(content.imageLeft);
+        } else {
+          actions.fitImage(content.imageRight, settings.width / 2, settings.height, settings.width / 2, 0);
+          determineAdj(content.imageRight);
+        }
+
+        function determineAdj(image) {
+          if (image.ratio < 1) {
+            actions.createAdjustment(button.parentElement, "Y", {name: "fs-side", value: side});
+          } else {
+            actions.createAdjustment(button.parentElement, "X", {name: "fs-side", value: side});
+          }
+        }
+
+        actions.enableInputs();
+      });
     }
   };
 
-  function _addListeners() {
-    var fieldsets = document.querySelectorAll(".generator__fieldset");
-
-    fieldsets.forEach(function(fieldset) {
-      var fieldButtons = fieldset.querySelectorAll(".generator__button"),
-          fieldInput = fieldset.querySelector("input");
-
-      if (fieldButtons.length === 1) {
-        fieldButtons[0].addEventListener("click", function() {
-          var inputClass = fieldInput.className,
-              inputValue = fieldInput.value;
-
-          switch (true) {
-            case actions.matchString(inputClass, "js-add-courtesy"):
-              if (settings.template == "fs_portrait") {
-                actions.renderPortrait();
-              } else if (settings.template == "fs_landscape") {
-                actions.renderLandscape();
-              } else {
-                _clearCanvas();
-                _enableInputs();
-              }
-              actions.addCourtesy(inputValue);
-              break;
-            case actions.matchString(inputClass, "js-add-text-group"):
-              if (settings.template == "l3_gradient") {
-                actions.renderLowerThirds();
-              } else if (settings.template == "l3_phoner") {
-                actions.renderL3_Phoner();
-              }
-              _enableInputs();
-              break;
-            case actions.matchString(inputClass, "js-file-name"):
-              actions.downloadCanvas(fieldInput.value);
-              break;
-            case actions.matchString(inputClass, "js-upload-article"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                actions.readFile(event, fieldInput, actions.renderArticleHeadline);
-                _enableInputs();
-              };
-              break;
-            case actions.matchString(inputClass, "js-upload-landscape"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                actions.readFile(event, fieldInput, actions.renderLandscape);
-                _enableInputs();
-              };
-              break;
-            case actions.matchString(inputClass, "js-upload-phoner"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                if (settings.template == "l3_gradient") {
-                  actions.readFile(event, fieldInput, actions.renderLowerThirds);
-                } else if (settings.template == "l3_phoner") {
-                  actions.readFile(event, fieldInput, actions.renderL3_Phoner);
-                }
-              };
-              break;
-            case actions.matchString(inputClass, "js-upload-portrait"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                actions.readFile(event, fieldInput, actions.renderPortrait);
-                _enableInputs();
-              };
-              break;
-            case actions.matchString(inputClass, "js-upload-side-left"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                actions.readFile(event, fieldInput, actions.renderSideLeft);
-              };
-              break;
-            case actions.matchString(inputClass, "js-upload-side-right"):
-              fieldInput.click();
-              fieldInput.onchange = function(event) {
-                event = event || window.event;
-                actions.readFile(event, fieldInput, actions.renderSideRight);
-                _enableInputs();
-              };
-              break;
-            default:
-              console.log("No match found for inputClass.");
-              break;
-          }
-        });
-      } else {
-        fieldButtons.forEach(function(fieldButton) {
-          var buttonClass = fieldButton.className;
-
-          fieldButton.addEventListener("click", function() {
-            var imagePos = Number(fieldInput.value);
-
-            switch (true) {
-              case actions.matchString(buttonClass, "js-xpos-decrease"):
-                // Get value and if it isn't zero, decrease by 10
-                if (imagePos > 0) {
-                  imagePos -= 10;
-                  actions.renderPortrait(imagePos / 100, null);
-                }
-                break;
-              case actions.matchString(buttonClass, "js-xpos-increase"):
-                // Get value and if it isn't zero, decrease by 10
-                if (imagePos < 100) {
-                  imagePos += 10;
-                  actions.renderPortrait(imagePos / 100, null);
-                }
-                break;
-              case actions.matchString(buttonClass, "js-ypos-decrease"):
-                // Get value and if it isn't zero, decrease by 10
-                if (imagePos > 0) {
-                  imagePos -= 10;
-                  if (settings.template == "fs_landscape") actions.renderLandscape(null, imagePos / 100);
-                  if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
-                }
-                break;
-              case actions.matchString(buttonClass, "js-ypos-increase"):
-                // Get value and if it isn't zero, decrease by 10
-                if (imagePos < 100) {
-                  imagePos += 10;
-                  if (settings.template == "fs_landscape") actions.renderLandscape(null, imagePos / 100);
-                  if (settings.template == "l3_phoner") actions.renderL3_Phoner(null, imagePos / 100);
-                }
-                break;
-              default:
-                console.log("No match found for buttonClass.");
-                break;
-            }
-          });
-        });
-      }
-    });
-  }
-
-  function _clearCanvas() {
-    settings.context.clearRect(0, 0, settings.width, settings.height);
-    settings.context.beginPath(); // Essential to clear rectangles, images, etc.
-  }
-
-  function _clearInputs() {
-    var allInputs = document.querySelectorAll("input");
-
-    allInputs.forEach(function(input) {
-      input.value = "";
-    });
-  }
-
-  function _enableInputs() {
-    var disabledField = document.querySelectorAll(".generator__fieldset--disabled");
-
-    disabledField.forEach(function(field) {
-      var children = field.children;
-      field.classList.remove("generator__fieldset--disabled");
-      for (var i = 0; i < children.length; i++) {
-        if (children[i].tagName == "INPUT" || children[i].tagName == "BUTTON") children[i].disabled = false;
-      }
-    });
-  }
-
-  function _setSortables() {
-    var sortParent = document.getElementById("jsSortable");
-    if (sortParent) {
-      var sortable = Sortable.create(sortParent, {
-        draggable: ".js-sortable-item", // must include the dot
-        dragClass: "js-sortable-drag",
-        ghostClass: "js-sortable-ghost",
-        chosenClass: "js-sortable-chosen",
-        filter: ".js-sortable-remove",
-        onFilter: function(event) {
-          var item = event.item,
-              control = event.target;
-
-          if (Sortable.utils.is(control, ".js-sortable-remove")) {
-            item.parentNode.removeChild(item);
-          }
-        },
-        onEnd: function(event) {
-          //
-        }
-      });
-    } else {
-      console.log("No sortable items found.");
-    }
-  }
-
-  // Inits
-  _clearInputs();
-  _addListeners();
-  _setSortables();
-
-  if (settings.template == "l3_gradient") {
-    actions.addBottomGradient(1/3);
-  } else if (settings.template == "fs_article") {
-    actions.addRadialGradient();
-  }
-
-  return actions;
+  if (settings.template == "l3_gradient") actions.setSortables();
+  return render;
 })(canvas);

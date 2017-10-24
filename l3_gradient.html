@@ -16,33 +16,28 @@
       </header>
       <section class="generator__preview">
         <h2 class="generator__caption">Preview</h2>
-        <canvas class="generator__canvas" width="1280" height="720" data-template="l3_gradient"></canvas>
+        <canvas class="generator__canvas" id="jsGeneratorCanvas" width="1280" height="720" data-template="l3_gradient"></canvas>
       </section>
       <section class="generator__controls">
         <fieldset class="generator__fieldset">
           <label class="generator__directions">Drag and re-order, or remove text as needed.</label>
           <div id="jsSortable">
             <div class="js-sortable-item"><span class="generator__label">Small Text</span>
-              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-remove"></span>
+              <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
             </div>
             <div class="js-sortable-item"><span class="generator__label">Large Text</span>
-              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500"><span class="js-sortable-remove"></span>
+              <input class="generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
             </div>
             <div class="js-sortable-item"><span class="generator__label">Small Text</span>
-              <input class="js-add-text-group generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-remove"></span>
+              <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
             </div>
           </div>
-          <button class="generator__button" type="button">Add Text Group</button>
-        </fieldset>
-        <fieldset class="generator__fieldset generator__fieldset--disabled">
-          <label class="generator__directions">Upload a portrait or landscape-oritented phoner.</label>
-          <input class="js-upload-phoner" type="file" accept=".jpg, .jpeg, .png" style="display: none;" disabled><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" disabled>Choose Image</button>
+          <button class="generator__button" type="button" onclick="generator.l3_gradient(this)">Add Text Group</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled">
           <label class="generator__directions">Name your file. All files save as .png.</label>
           <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
-          <button class="generator__button" type="button" disabled>Download File</button>
+          <button class="generator__button" type="button" onclick="generator.download(this)" disabled>Download File</button>
         </fieldset>
       </section>
     </div>
