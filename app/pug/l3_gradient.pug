@@ -17,30 +17,30 @@ html(lang="en")
         h2.generator__caption Preview
         canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template="l3_gradient")
       section.generator__controls
+        fieldset.generator__fieldset.generator__fieldset
+          label.generator__directions Upload a portrait-oriented photo. It's optional.
+          input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
+          span.generator__input.generator__input--image No file uploaded yet.
+          button.generator__button(type="button" onclick="generator.l3_gradient(this)") Choose Image
         fieldset.generator__fieldset
           label.generator__directions Drag and re-order, or remove text as needed.
           #jsSortable
             .js-sortable-item
-              span.generator__label Small Text
+              span.generator__label Subheading
               input.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
               span.js-sortable-move
               span.js-sortable-remove
             .js-sortable-item
-              span.generator__label Large Text
-              input.generator__input.generator__input--text(type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="500")
+              span.generator__label Heading
+              input.generator__input.generator__input--text(type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="600")
               span.js-sortable-move
               span.js-sortable-remove
             .js-sortable-item
-              span.generator__label Small Text
+              span.generator__label Subheading
               input.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
               span.js-sortable-move
               span.js-sortable-remove
           button.generator__button(type="button" onclick="generator.l3_gradient(this)") Add Text Group
-        //- fieldset.generator__fieldset.generator__fieldset--disabled
-        //-   label.generator__directions Upload a portrait or landscape-oritented phoner.
-        //-   input.js-upload-phoner(type="file" accept=".jpg, .jpeg, .png" style="display: none" disabled)
-        //-   span.generator__input.generator__input--image No file uploaded yet.
-        //-   button.generator__button(type="button" disabled) Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
           label.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)

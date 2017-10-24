@@ -508,7 +508,7 @@ var generator = (function() {
           actions.fitImage(content.imageRight, settings.width / 2, settings.height, settings.width / 2, 0, 0.5, value);
         }
 
-        if (settings.template == "l3_phoner") actions.fitImage(content.image, 178, 178, 80, 500, 0.5, value);
+        if (settings.template == "l3_phoner") actions.fitImage(content.image, 170, 170, 80, 500, 0.5, value);
       }
     },
 
@@ -594,32 +594,60 @@ var generator = (function() {
     /* RENDER: L3 Gradient
     ====================================== */
     l3_gradient: function(button) {
-      var inputsArray = button.parentElement.querySelectorAll("input"),
-          blankInputs = actions.checkBlankInputs(inputsArray),
+      var input = button.parentElement.querySelector("input"),
           startX = 80,
-          startY = 720,
-          marginTop = 5;
+          startY = 500,
+          marginTop = 5,
+          marginRight = 20;
 
-      // Calculate how far up the text group needs to be drawn from the bottom of the canvas
-      inputsArray.forEach(function(input) {
-        var fSize = Number(input.dataset.fontSize);
-        startY -= fSize + marginTop;
-      });
+      if (input.type == "file") {
+        actions.getFile(input, function() {
+          var maxHeight = 170,
+              newImageWidth = content.image.ratio * maxHeight;
 
-      // Add padding between bottom edge of text group and bottom edge of canvas
-      startY -= 40;
-
-      if (blankInputs > 0) {
-        alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
-      } else {
-        actions.clearCanvas();
-        actions.addBottomGradient(1/3);
-        inputsArray.forEach(function(input) {
-          actions.addText(input.value, Number(input.dataset.fontSize), input.dataset.fontWeight, "white", startX, startY);
-          startY += Number(input.dataset.fontSize) + marginTop;
-          // NOTE: Figure out how to combine the two forEach loops above
+          actions.clearCanvas();
+          actions.addBottomGradient(1/3);
+          content.slice = settings.context.getImageData((startX + newImageWidth + marginRight), startY, (settings.width - startX), (settings.height - startY));
+          actions.clearInputs();
+          settings.context.drawImage(content.image, startX, startY, newImageWidth, maxHeight);
+          content.image.width = newImageWidth;
+          content.image.height = maxHeight;
         });
-        actions.enableInputs();
+      } else {
+        var inputsArray = button.parentElement.querySelectorAll("input"),
+            blankInputs = actions.checkBlankInputs(inputsArray);
+
+        if (content.image != null) {
+          startX += content.image.width + marginRight;
+          settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes any previous text
+          console.log(startY);
+          settings.context.putImageData(content.slice, startX, startY);
+        } else {
+          actions.clearCanvas();
+          actions.addBottomGradient(1/3);
+        }
+
+        // Starts inversely, add padding between bottom edge of text group and bottom edge of canvas
+        startY = 720 - 40;
+
+        // Calculate how far up the text group needs to be drawn from the bottom of the canvas
+        inputsArray.forEach(function(input) {
+          var fSize = Number(input.dataset.fontSize);
+          startY -= fSize + marginTop;
+        });
+
+        if (blankInputs > 0) {
+          alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
+        } else {
+          // actions.clearCanvas();
+          // actions.addBottomGradient(1/3);
+          inputsArray.forEach(function(input) {
+            actions.addText(input.value, Number(input.dataset.fontSize), input.dataset.fontWeight, "white", startX, startY);
+            startY += Number(input.dataset.fontSize) + marginTop;
+            // NOTE: Figure out how to combine the two forEach loops above
+          });
+          actions.enableInputs();
+        }
       }
     },
 
@@ -641,13 +669,14 @@ var generator = (function() {
 
       if (input.type == "file") {
         actions.getFile(input, function() {
+
           if (content.image.ratio <= 1) {
             actions.clearCanvas();
             actions.removeAdjustment(button.parentElement);
             actions.clearInputs();
 
             // Deletes phoner image previously drawn, leaving behind transparent canvas
-            settings.context.clearRect(startX, startY, squareDimensions, squareDimensions);
+            // settings.context.clearRect(startX, startY, squareDimensions, squareDimensions);
 
             // White border
             settings.context.strokeStyle = "white";
@@ -659,8 +688,6 @@ var generator = (function() {
 
             // Don't present adjustment to square images – they already fit perfectly
             if (content.image.ratio !== 1) actions.createAdjustment(button.parentElement, "Y");
-
-            actions.enableInputs();
 
             // NOTE: What about situation where image size is 1188 x 1189?
           } else {
@@ -684,6 +711,8 @@ var generator = (function() {
             startY += 60;
             actions.addTextWithRect(input.value, Number(input.dataset.fontSize), Number(input.dataset.fontWeight), "black", startX, startY, "white", rectOpacity, rectPadding);
           });
+
+          actions.enableInputs();
         }
       }
     },
@@ -751,6 +780,9 @@ var generator = (function() {
     }
   };
 
-  if (settings.template == "l3_gradient") actions.setSortables();
+  if (settings.template == "l3_gradient") {
+    actions.setSortables();
+    actions.addBottomGradient(1/3);
+  }
   return render;
 })(canvas);

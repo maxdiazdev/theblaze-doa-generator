@@ -19,16 +19,16 @@
         <canvas class="generator__canvas" id="jsGeneratorCanvas" width="1280" height="720" data-template="l3_phoner"></canvas>
       </section>
       <section class="generator__controls">
-        <fieldset class="generator__fieldset">
-          <label class="generator__directions">Upload phoner's photo. Must be portrait-oriented.</label>
+        <fieldset class="generator__fieldset generator__fieldset">
+          <label class="generator__directions">Upload a portrait-oriented photo. It's optional.</label>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
           <button class="generator__button" type="button" onclick="generator.l3_phoner(this)">Choose Image</button>
         </fieldset>
-        <fieldset class="generator__fieldset generator__fieldset--disabled">
+        <fieldset class="generator__fieldset">
           <label class="generator__directions">Add phoner's name and their description.</label><span class="generator__label">Name</span>
-          <input class="generator__input generator__input--text" type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="600" disabled><span class="generator__label">Description</span>
-          <input class="generator__input generator__input--text" type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400" disabled>
-          <button class="generator__button" type="button" onclick="generator.l3_phoner(this)" disabled>Add Text Group</button>
+          <input class="generator__input generator__input--text" type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="600"><span class="generator__label">Description</span>
+          <input class="generator__input generator__input--text" type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400">
+          <button class="generator__button" type="button" onclick="generator.l3_phoner(this)">Add Text Group</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled">
           <label class="generator__directions">Name your file. All files save as .png.</label>
