@@ -109,10 +109,10 @@ var generator = (function() {
           social.image.onload = function() {
             var marginOfErr = 9,
                 squareDimensions = fSize - marginOfErr,
-                marginRight = 42;
+                marginRight = 10;
 
             context.drawImage(social.image, startX, startY, squareDimensions, squareDimensions);
-            context.fillText(social.handle, (startX + marginRight), startY);
+            context.fillText(social.handle, (startX + squareDimensions + marginRight), startY);
           };
         } else {
           context.fillText(string, startX, startY);
@@ -128,8 +128,9 @@ var generator = (function() {
           fFamily = settings.font,
           rectWidth = "",
           rectHeight = fSize + rectPadding.bottom,
+          marginOfErr = 5,
           social = actions.checkSocial(string),
-          socialDimensions = fSize - 8,
+          socialDimensions = fSize - marginOfErr,
           marginRight = 10;
 
       context.font = fWeight + " " + fSize + "px " + fFamily;
@@ -162,7 +163,7 @@ var generator = (function() {
 
       if (social) {
         social.image.onload = function() {
-          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + 7), socialDimensions, socialDimensions);
+          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
         };
       }
 
@@ -614,7 +615,7 @@ var generator = (function() {
         actions.clearCanvas();
         actions.addBottomGradient(1/3);
         inputsArray.forEach(function(input) {
-          actions.addText(input.value, input.dataset.fontSize, input.dataset.fontWeight, "white", startX, startY);
+          actions.addText(input.value, Number(input.dataset.fontSize), input.dataset.fontWeight, "white", startX, startY);
           startY += Number(input.dataset.fontSize) + marginTop;
           // NOTE: Figure out how to combine the two forEach loops above
         });
@@ -628,7 +629,7 @@ var generator = (function() {
       var input = actions.getInput(button),
           startX = 80,
           startY = 500,
-          squareDimensions = 178,
+          squareDimensions = 170,
           marginRight = 20,
           rectOpacity = 1,
           rectPadding = {
