@@ -217,6 +217,7 @@ img
   &__button
     display: inline-block
     padding: 12px 20px
+    margin-right: 5px
     border: none
     border-radius: 3px
     background-color: $theme-black
@@ -333,6 +334,20 @@ img
 .js-sortable-item
   position: relative
 
+.js-sortable-move
+  width: 30px
+  height: 30px
+  display: block
+  position: absolute
+  top: 30px
+  right: 60px
+  cursor: pointer
+
+  background:
+    image: url("../img/icons/icon-move.svg")
+    repeat: no-repeat
+    size: cover
+
 .js-sortable-remove
   width: 30px
   height: 30px
@@ -343,14 +358,33 @@ img
   cursor: pointer
 
   background:
-    image: url("../img/icons/icon-close.png")
+    image: url("../img/icons/icon-remove.png")
     repeat: no-repeat
     size: cover
 
-.js-sortable-ghost > *
+.js-sortable-ghost > .generator__label
   color: $theme-black
+
+.js-sortable-ghost > .generator__input--text
   border-color: $theme-black
   background-color: $theme-black
+
+  &::-webkit-input-placeholder
+    color: $theme-black
+
+  &::-moz-placeholder
+    color: $theme-black
+
+  &:-ms-input-placeholder
+    color: $theme-black
+
+  &:-moz-placeholder
+    color: $theme-black
+    opacity: 1
+
+.js-sortable-ghost > .js-sortable-move,
+.js-sortable-ghost > .js-sortable-remove,
+  display: none
 
 .generator__half-column
   width: calc(50% - 5px)
