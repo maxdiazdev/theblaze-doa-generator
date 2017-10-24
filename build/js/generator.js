@@ -13,7 +13,7 @@ var generator = (function() {
     height: canvas.height,
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
-    font: "\"Helvetica Neue\""
+    font: "\"Helvetica Neue\"" // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
   };
 
   // Store drawn text or images as needed, throughout the app
