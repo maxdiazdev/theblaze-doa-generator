@@ -1,10 +1,11 @@
 # day-of-air-generator
-A client-side application for TV producers that generates standard graphics.
+A client-side application for TV producers that generates on-air screen graphics using HTML5 Canvas.
 
 ## Issues
-* Disable drag on inputs when trying to select and delete text
-* Require portrait or landscape photos depending on the template
-* Require minimum dimensions on photos, both for fullscreens and phoners
-* Update homepage look
-* Re-write code to accept textBaselines as "alphabetical" for support on Firefox: https://github.com/CreateJS/EaselJS/issues/650
-* Add drag-and-drop capabilities
+1. Correct L3_Gradient to match our Photoshop template
+2. Fix transparent edges on FS_Portrait
+3. Use "TeX Gyre Heros" as back-up font and test on Windows machine
+4. Use arrows and use inline-input with text. Ex. "Your image is [50%] from the top of canvas."
+5. Add minimum resolution for images according to canvas or container
+6. Add FS_Centered template with no-crop, while waiting for #7.
+7. Allow scaling of images
