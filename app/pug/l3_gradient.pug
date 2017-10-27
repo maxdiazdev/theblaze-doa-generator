@@ -41,10 +41,10 @@ html(lang="en")
               span.js-sortable-move
               span.js-sortable-remove
           button.generator__button(type="button" onclick="generator.l3_gradient(this)") Add Text Group
-        fieldset.generator__fieldset.generator__fieldset--disabled
+        fieldset.generator__fieldset
           label.generator__directions Name your file. All files save as .png.
-          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
-          button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
+          input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here.")
+          button.generator__button(type="button" onclick="generator.download(this)") Download File
   script(src="js/file-saver.min.js")
   script(src="js/Sortable.min.js")
   script(src="js/generator.js")

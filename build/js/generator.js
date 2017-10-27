@@ -31,9 +31,9 @@ var generator = (function() {
           endY = settings.height - settings.height * ratio,
           gradient = settings.context.createLinearGradient(startX, startY, endX, endY);
 
-      gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
-      gradient.addColorStop(0.5, "rgba(0, 0, 0, 0.7)");
-      gradient.addColorStop(1, "rgba(0, 0, 0 ,0)");
+      gradient.addColorStop(0, "rgba(0, 0, 0, 0.8)");
+      gradient.addColorStop(0.43, "rgba(0, 0, 0, 0.75)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
       settings.context.fillStyle = gradient;
       settings.context.fillRect(startX, endY, settings.width, settings.height);
     },
@@ -782,7 +782,7 @@ var generator = (function() {
 
   if (settings.template == "l3_gradient") {
     actions.setSortables();
-    actions.addBottomGradient(1/3);
+    actions.addBottomGradient(1/4);
   }
   return render;
 })(canvas);
