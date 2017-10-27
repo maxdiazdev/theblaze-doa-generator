@@ -606,7 +606,7 @@ var generator = (function() {
               newImageWidth = content.image.ratio * maxHeight;
 
           actions.clearCanvas();
-          actions.addBottomGradient(1/3);
+          actions.addBottomGradient(1/4);
           content.slice = settings.context.getImageData((startX + newImageWidth + marginRight), startY, (settings.width - startX), (settings.height - startY));
           actions.clearInputs();
           settings.context.drawImage(content.image, startX, startY, newImageWidth, maxHeight);
@@ -624,7 +624,7 @@ var generator = (function() {
           settings.context.putImageData(content.slice, startX, startY);
         } else {
           actions.clearCanvas();
-          actions.addBottomGradient(1/3);
+          actions.addBottomGradient(1/4);
         }
 
         // Starts inversely, add padding between bottom edge of text group and bottom edge of canvas
@@ -640,7 +640,7 @@ var generator = (function() {
           alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
         } else {
           // actions.clearCanvas();
-          // actions.addBottomGradient(1/3);
+          // actions.addBottomGradient(1/4);
           inputsArray.forEach(function(input) {
             actions.addText(input.value, Number(input.dataset.fontSize), input.dataset.fontWeight, "white", startX, startY);
             startY += Number(input.dataset.fontSize) + marginTop;
