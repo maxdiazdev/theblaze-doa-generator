@@ -15,7 +15,7 @@
 body {
   margin: 0;
   background-color: #ededed;
-  font-family: "Helvetica Neue", "tex_gyre_heros", Arial, sans-serif;
+  font-family: "Helvetica Neue", "tex_gyre_heros", sans-serif;
   font-size: 16px;
 }
 
@@ -207,7 +207,7 @@ img {
 
 .generator__title {
   font-size: 43px;
-  font-weight: 500;
+  font-weight: 800;
   text-align: center;
   color: #333333;
 }
@@ -325,7 +325,7 @@ img {
   width: 100%;
   margin-bottom: 15px;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 800;
   color: #333333;
 }
 
