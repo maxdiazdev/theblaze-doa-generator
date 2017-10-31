@@ -10,7 +10,7 @@ var generator = (function() {
   // Check for Helvetica. Uses font-detect.js. Source: http://www.lalit.org/lab/javascript-css-font-detect/
   var isHelvetica = new Detector();
   isHelvetica = isHelvetica.detect("Helvetica Neue");
-  console.log(isHelvetica);
+  console.log(isHelvetica ? "\"Helvetica\" detected." : "\"Helvetica\" NOT detected.");
 
   // Store canvas attributes
   var settings = {
