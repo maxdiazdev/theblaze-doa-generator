@@ -713,7 +713,12 @@ var generator = (function() {
           // Draw "On the Phone"
           if (content.image != null) startX += squareDimensions + marginRight;
           settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes phoner text previously drawn, leaving behind transparent canvas
-          actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
+          
+          if (isHelvetica) {
+            actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
+          } else {
+            actions.addTextWithRect("On the Phone", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
+          }
 
           // Draw rest of text
           inputsArray.forEach(function(input) {
