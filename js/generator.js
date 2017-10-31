@@ -167,7 +167,7 @@ var generator = (function() {
       }
 
       if (!isHelvetica) {
-        startY -= 8;
+        startY -= 5;
       }
 
       if (social) {
