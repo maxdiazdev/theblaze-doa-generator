@@ -195,6 +195,28 @@ img {
   display: block;
 }
 
+.nav__button {
+  padding: 15px;
+  border-radius: 3px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: #333333;
+  text-decoration: none;
+  color: white;
+}
+
+.nav__button:before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  margin-right: 15px;
+  display: inline-block;
+  background-image: url("../img/icons/icon-back.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .generator {
   width: 640px;
   margin: 0 auto;
