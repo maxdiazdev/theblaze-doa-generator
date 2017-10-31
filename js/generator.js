@@ -21,12 +21,6 @@ var generator = (function() {
     font: "\"Helvetica Neue\", \"tex_gyre_heros\"" // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
   };
 
-  // Check for L3_Gradient. If so, apply bottom gradient when page loads.
-  if (settings.template == "l3_gradient") {
-    actions.setSortables();
-    actions.addBottomGradient(1/4);
-  }
-
   // Store drawn text or images as needed, throughout the app
   var content = {};
 
@@ -792,6 +786,12 @@ var generator = (function() {
       });
     }
   };
+
+  // Check for L3_Gradient. If so, apply bottom gradient when page loads.
+  if (settings.template == "l3_gradient") {
+    actions.setSortables();
+    actions.addBottomGradient(1/4);
+  }
 
   return render;
 })(canvas);
