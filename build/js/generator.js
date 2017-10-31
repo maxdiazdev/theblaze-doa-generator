@@ -13,7 +13,7 @@ var generator = (function() {
     height: canvas.height,
     context: canvas.getContext("2d"),
     template: canvas.dataset.template,
-    font: "\"Helvetica Neue\"" // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
+    font: "\"Helvetica Neue\", \"tex_gyre_heros\"" // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
   };
 
   // Store drawn text or images as needed, throughout the app
@@ -732,6 +732,8 @@ var generator = (function() {
           content.slice = null; // Reset courtesy slices
 
           // Background image
+          settings.context.fillStyle = "black";
+          settings.context.fillRect(0, 0, settings.width, settings.height);
           settings.context.filter = "grayscale(100%) brightness(50%) blur(5px)";
           actions.fitImage(content.image);
 
