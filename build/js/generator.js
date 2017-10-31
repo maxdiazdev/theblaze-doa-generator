@@ -166,6 +166,10 @@ var generator = (function() {
         console.log("Firefox detected. startY was adjusted to " + startY + " to compensate for textBaseline bug");
       }
 
+      if (!isHelvetica) {
+        startY -= 8;
+      }
+
       if (social) {
         social.image.onload = function() {
           context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
