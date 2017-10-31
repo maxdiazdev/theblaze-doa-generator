@@ -7,6 +7,11 @@ var generator = (function() {
   // Check for Firefox. It has a bug with text alignments: https://github.com/CreateJS/EaselJS/issues/650
   var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
+  // Check for Helvetica. Uses font-detect.js. Source: http://www.lalit.org/lab/javascript-css-font-detect/
+  var isHelvetica = new Detector();
+  isHelvetica = isHelvetica.detect("Helvetica Neue");
+  console.log(isHelvetica);
+
   // Store canvas attributes
   var settings = {
     width: canvas.width,
@@ -15,6 +20,12 @@ var generator = (function() {
     template: canvas.dataset.template,
     font: "\"Helvetica Neue\", \"tex_gyre_heros\"" // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
   };
+
+  // Check for L3_Gradient. If so, apply bottom gradient when page loads.
+  if (settings.template == "l3_gradient") {
+    actions.setSortables();
+    actions.addBottomGradient(1/4);
+  }
 
   // Store drawn text or images as needed, throughout the app
   var content = {};
@@ -782,9 +793,5 @@ var generator = (function() {
     }
   };
 
-  if (settings.template == "l3_gradient") {
-    actions.setSortables();
-    actions.addBottomGradient(1/4);
-  }
   return render;
 })(canvas);
