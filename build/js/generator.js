@@ -161,12 +161,13 @@ var generator = (function() {
       context.globalAlpha = 1.0; // Reset opacity
       context.fillStyle = fColor;
 
-      if (isFirefox && isHelvetica) {
-        startY += 5;
-        console.log("Firefox detected. startY was adjusted to " + startY + " to compensate for textBaseline bug");
-      }
-
-      if (!isHelvetica) {
+      if (isFirefox) {
+        if (isHelvetica) {
+          startY += 5;
+        } else {
+          startY += 15;
+        }
+      } else if (!isHelvetica) {
         startY -= 5;
       }
 
