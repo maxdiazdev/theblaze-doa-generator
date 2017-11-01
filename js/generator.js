@@ -382,7 +382,6 @@ var generator = (function() {
         setTimeout(function() {
           var button = input.parentElement.querySelector("button");
           if (settings.template == "fs_side-by-side") {
-            console.log("FS_SIDE-BY-SIDE");
             if (button.dataset.fsSide == "left") {
               content.imageLeft = image;
               content.imageLeft.ratio = image.width / image.height;
@@ -390,7 +389,6 @@ var generator = (function() {
               content.imageRight = image;
               content.imageRight.ratio = image.width / image.height;
             }
-            console.log(content.imageLeft + ", " + content.imageRight);
           } else {
             content.image = image;
             content.image.ratio = image.width / image.height;
@@ -559,6 +557,7 @@ var generator = (function() {
       if (courtesy.length > 0) {
         if (content.slice) actions.restoreCourtesyArea();
         if (settings.template == "fs_landscape") content.courtesy = courtesy; // adjustImg function redraws the courtesy from scratch after moving fs_landscape background up or down. We can't use content.slice in this situation because it wouldn't match the background after its been moved.
+        if (!isHelvetica) fWeight = 800;
         actions.addTextWithRect(courtesy, fSize, fWeight, fColor, startX, startY, rectColor, rectOpacity, rectPadding);
         if (settings.template == "courtesy") actions.enableInputs();
       } else {
@@ -713,7 +712,7 @@ var generator = (function() {
           // Draw "On the Phone"
           if (content.image != null) startX += squareDimensions + marginRight;
           settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes phoner text previously drawn, leaving behind transparent canvas
-          
+
           if (isHelvetica) {
             actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
           } else {
