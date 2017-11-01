@@ -714,17 +714,31 @@ var generator = (function() {
           if (content.image != null) startX += squareDimensions + marginRight;
           settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes phoner text previously drawn, leaving behind transparent canvas
 
+          /*
           if (isHelvetica) {
             actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
           } else {
             actions.addTextWithRect("On the Phone", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
           }
+          */
 
+          for (var i = 0; i < inputsArray.length; i++) {
+            if (i === 0) {
+              actions.addTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), "white", startX, startY, "black", rectOpacity, rectPadding);
+            } else {
+              actions.addTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), "black", startX, startY, "white", rectOpacity, rectPadding);
+            }
+
+            startY += 60;
+          }
+
+          /*
           // Draw rest of text
           inputsArray.forEach(function(input) {
             startY += 60;
             actions.addTextWithRect(input.value, Number(input.dataset.fontSize), Number(input.dataset.fontWeight), "black", startX, startY, "white", rectOpacity, rectPadding);
           });
+          */
 
           actions.enableInputs();
         }
