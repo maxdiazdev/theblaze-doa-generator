@@ -328,9 +328,24 @@ img {
   overflow: hidden;
 }
 
-.generator__input--text, .generator__input--number {
+.generator__input--text {
   padding: 12px 15px;
   border: 5px solid #ededed;
+}
+
+.generator__input--number {
+  display: inline;
+  width: auto;
+  padding: 2px 5px;
+  margin-right: 5px;
+  margin-bottom: 0;
+  background-color: #ededed;
+  border: none;
+  font-size: 20px;
+}
+
+.generator__input--hidden {
+  display: none;
 }
 
 .generator__label {

@@ -245,7 +245,9 @@ var generator = (function() {
     ====================================== */
     createAdjustment: function(fileFieldset, axisLetter, buttonAttr) {
       var posFieldset = document.createElement("fieldset"),
-          axisName = (axisLetter == "X" ? "horizontally" : "vertically");
+          axisName = (axisLetter == "X" ? "left or right" : "up or down"),
+          inputDirection = (axisLetter == "X") ? "% from the left." : "% from the top.",
+          arrowStyle = [(axisLetter == "X") ? "transform: rotate(90deg);" : "transform: rotate(0deg);", (axisLetter == "X") ? "transform: rotate(-90deg);" : "transform: rotate(180deg);"];
 
       posFieldset.className = "generator__fieldset";
       posFieldset.className += " js-generator-pos-fieldset"; // Used for removeAdjustment function. Must include space!
@@ -253,9 +255,9 @@ var generator = (function() {
       if (buttonAttr) {
         buttonAttr = "data-" + buttonAttr.name + "='" + buttonAttr.value + "'";
 
-        posFieldset.innerHTML = "<label class=\"generator__directions\">Adjust the photo " + axisName + ", if needed.</label><input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\"/><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\" " + buttonAttr + ">-10%</button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\" " + buttonAttr + ">+10%</button>";
+        posFieldset.innerHTML = "<label class=\"generator__directions\">Move photo " + axisName + ", if needed.</label><span style=\"display: block; font-size: 20px; margin-top: -15px; margin-bottom: 25px;\">Image is currently cropped <input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\" disabled/>" + inputDirection + "</span><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[0] + "\"/></button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[1] + "\"/></button>";
       } else {
-        posFieldset.innerHTML = "<label class=\"generator__directions\">Adjust the photo " + axisName + ", if needed.</label><input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\"/><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\">-10%</button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\">+10%</button>";
+        posFieldset.innerHTML = "<label class=\"generator__directions\">Move photo " + axisName + ", if needed.</label><span style=\"display: block; font-size: 20px; margin-top: -15px; margin-bottom: 25px;\">Image is currently cropped <input class=\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\" disabled/>" + inputDirection + "</span><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'decrease')\"><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[0] + "\"/></button><button class=\"generator__button\" type=\"button\" onclick=\"generator.adjustImg(this, '" + axisLetter + "', 'increase')\"><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[1] + "\"/></button>";
       }
 
       insertAfter(posFieldset, fileFieldset);
@@ -396,7 +398,7 @@ var generator = (function() {
           }
           display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
           callback();
-        }, 200);
+        }, 400); // Set to 400 to give time for uploads from the server. Used to be 200.
       }
     },
 
