@@ -216,6 +216,10 @@ var generator = (function() {
           social.image.src = "img/icons/icon-instagram.png";
           social.handle = string.replace("instagram ", "");
           break;
+        case string.includes("@youtube"):
+          social.image.src = "img/icons/icon-youtube.png";
+          social.handle = string.replace("@youtube ", "");
+          break;
         default:
           social = false;
           break;
