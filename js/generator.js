@@ -170,7 +170,14 @@ var generator = (function() {
           startY += 8;
         }
       } else {
+        // Chrome, for example, on either Windows or Mac
         marginOfErr += 2;
+
+        // For Windows, specifically
+        if (!isHelvetica) {
+          marginOfErr += 8;
+          startY -= 5;
+        }
       }
 
       if (social) {
