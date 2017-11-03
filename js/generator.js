@@ -133,7 +133,7 @@ var generator = (function() {
           fFamily = settings.font,
           rectWidth = "",
           rectHeight = fSize + rectPadding.bottom,
-          marginOfErr = 5,
+          marginOfErr = 0,
           social = actions.checkSocial(string),
           socialDimensions = fSize - marginOfErr,
           marginRight = 10;
@@ -161,20 +161,22 @@ var generator = (function() {
       context.globalAlpha = 1.0; // Reset opacity
       context.fillStyle = fColor;
 
-      if (social) {
-        social.image.onload = function() {
-          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
-        };
-      }
-
       if (isFirefox) {
+        marginOfErr -= 3;
+
         if (isHelvetica) {
           startY += 5;
         } else {
           startY += 8;
         }
-      } else if (!isHelvetica) {
-        startY -= 5;
+      } else {
+        marginOfErr += 2;
+      }
+
+      if (social) {
+        social.image.onload = function() {
+          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
+        };
       }
 
       if (social) {
