@@ -173,7 +173,7 @@ var generator = (function() {
 
       if (social) {
         social.image.onload = function() {
-          if (isFirefox) startY -= 5;
+          if (isFirefox && !isHelvetica) startY -= 5;
           context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
         };
       }
