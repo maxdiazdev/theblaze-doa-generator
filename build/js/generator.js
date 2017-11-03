@@ -161,6 +161,12 @@ var generator = (function() {
       context.globalAlpha = 1.0; // Reset opacity
       context.fillStyle = fColor;
 
+      if (social) {
+        social.image.onload = function() {
+          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
+        };
+      }
+
       if (isFirefox) {
         if (isHelvetica) {
           startY += 5;
@@ -169,12 +175,6 @@ var generator = (function() {
         }
       } else if (!isHelvetica) {
         startY -= 5;
-      }
-
-      if (social) {
-        social.image.onload = function() {
-          context.drawImage(social.image, (startX + rectPadding.left), (startY + rectPadding.top + marginOfErr), socialDimensions, socialDimensions);
-        };
       }
 
       if (social) {
