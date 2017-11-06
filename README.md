@@ -9,8 +9,10 @@ A client-side application for TV producers that generates on-air screen graphics
 5. ~~Add YouTube logo to social icons.~~
 6. ~~Fix social icons alignment when using "Tex Gyre Heros"~~
 7. ~~Make "On the Phone" text font-weight 800 when using "Helvetica"~~
-8. Add minimum resolution for images according to canvas or container
-9. Remove portrait vs landscape restriction across all templates
-10. ~~Add FS_Centered template with no-crop, while waiting for #7~~
-11. Allow scaling of images
-12. Improve readFile() by getting image properties onload, if possible, rather than using setTimeout()
+8. ~~Add FS_No-Crop template, while waiting for scaling~~
+9. Check compatibility on modern browsers and add notes to README
+10. Routine clean-up of GeneratorJS
+11. Improve readFile() by getting image properties onload. If not, provide warning for images larger than a certain size (ex. 4000 x 4000).
+12. Allow scaling of images
+13. Remove portrait vs landscape restriction across templates
+14. Add minimum resolution for images according to canvas or container
