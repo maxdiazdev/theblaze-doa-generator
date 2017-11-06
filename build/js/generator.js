@@ -847,6 +847,8 @@ var generator = (function() {
           // Reverse, set width to 720 and allow flexible height
           newImageWidth = settings.width;
           maxImageHeight = content.image.ratio * newImageWidth;
+          startX = settings.width / 2;
+          startY = (settings.height - maxImageHeight) / 2;
 
           settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
         }
