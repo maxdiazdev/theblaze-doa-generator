@@ -841,7 +841,15 @@ var generator = (function() {
         content.slice = null; // Reset courtesy slices
         settings.context.fillStyle = "black";
         settings.context.fillRect(0, 0, settings.width, settings.height);
-        settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
+        if (newImageWidth <= settings.width) {
+          settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
+        } else {
+          // Reverse, set width to 720 and allow flexible height
+          newImageWidth = settings.width;
+          maxImageHeight = content.image.ratio * newImageWidth;
+
+          settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
+        }
         actions.enableInputs();
       });
     }
