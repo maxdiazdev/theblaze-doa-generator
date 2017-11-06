@@ -822,6 +822,28 @@ var generator = (function() {
           }
         }
       });
+    },
+
+    /* RENDER: Landscape
+    ====================================== */
+    noCrop: function(button) {
+      var input = actions.getInput(button);
+      actions.getFile(input, function() {
+        var maxImageHeight = settings.height,
+            newImageWidth = content.image.ratio * maxImageHeight,
+            startX = (settings.width - newImageWidth) / 2,
+            startY = 0;
+
+        console.log("maxImageHeight: " + maxImageHeight + ", newImageWidth: " + newImageWidth + ", startX: " + startX + ", startY: " + startY);
+
+        actions.clearCanvas();
+        actions.clearInputs();
+        content.slice = null; // Reset courtesy slices
+        settings.context.fillStyle = "black";
+        settings.context.fillRect(0, 0, settings.width, settings.height);
+        settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
+        actions.enableInputs();
+      });
     }
   };
 
