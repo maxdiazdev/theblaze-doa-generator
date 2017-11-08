@@ -584,14 +584,21 @@ var generator = (function() {
     /* RENDER: Download canvas... It should be in actions, but we need to access it publicly.
     ====================================== */
     download: function(button) {
-      var fileName = actions.getInput(button).value;
+      var fileName = actions.getInput(button).value,
+          dataURL = false;
 
       if (fileName) {
-        canvas.toBlob(function(blob) {
-          saveAs(blob, fileName + ".png");
-        });
+        if (canvas.toBlob) {
+          canvasData = canvas.toDataURL(); // Defaults to PNG
+          blob = window.dataURLtoBlob && window.dataURLtoBlob(canvasData);
+          canvas.toBlob(function (blob) {
+            saveAs(blob, fileName + ".png");
+          });
+        } else {
+          console.log("canvas.toBlob and it's polyfills aren't supported in this browser.");
+        }
       } else {
-        alert("Please enter a file name before downloading.");
+        alert("Please name your file before downloading.");
       }
     },
 
