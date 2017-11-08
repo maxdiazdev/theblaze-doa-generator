@@ -44,7 +44,7 @@ var generator = (function() {
     },
 
     /* ACTIONS: Add Phoner
-    ====================================== */
+    ======================================
     addPhoner: function(offsetCropX, offsetCropY) {
       var context = settings.context,
           startX = 80,
@@ -56,6 +56,7 @@ var generator = (function() {
       context.strokeRect(startX, startY, squareDimensions, squareDimensions);
       actions.fitImage(content.image, squareDimensions, squareDimensions, startX, startY, offsetCropX, offsetCropY);
     },
+    */
 
     /* ACTIONS: Add Radial Gradient
     ====================================== */
@@ -382,7 +383,7 @@ var generator = (function() {
       var file = input.files[0],
           reader = new FileReader(),
           image = new Image(),
-          display = input.parentElement.querySelector("span");
+          display = input.parentElement.querySelector(".generator__input--image");
 
       if (file) {
         reader.onload = function(event) {
@@ -736,14 +737,14 @@ var generator = (function() {
           if (content.image != null) startX += squareDimensions + marginRight;
           settings.context.clearRect(startX, startY, (settings.width - startX), (settings.height - startY)); // Deletes phoner text previously drawn, leaving behind transparent canvas
 
-          /*
-          if (isHelvetica) {
-            actions.addTextWithRect("On the Phone", 33, 500, "white", startX, startY, "black", rectOpacity, rectPadding);
-          } else {
+          // If either "On the Phone" or "Voice Of" is checked, draw label
+          if (document.getElementById("OnthePhone").checked) {
             actions.addTextWithRect("On the Phone", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
+          } else if (document.getElementById("VoiceOf").checked) {
+            actions.addTextWithRect("Voice Of", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
           }
-          */
 
+          /*
           for (var i = 0; i < inputsArray.length; i++) {
             if (i === 0) {
               actions.addTextWithRect(inputsArray[i].value, Number(inputsArray[i].dataset.fontSize), Number(inputsArray[i].dataset.fontWeight), "white", startX, startY, "black", rectOpacity, rectPadding);
@@ -753,19 +754,46 @@ var generator = (function() {
 
             startY += 60;
           }
+          */
 
-          /*
           // Draw rest of text
           inputsArray.forEach(function(input) {
             startY += 60;
             actions.addTextWithRect(input.value, Number(input.dataset.fontSize), Number(input.dataset.fontWeight), "black", startX, startY, "white", rectOpacity, rectPadding);
           });
-          */
 
           actions.enableInputs();
         }
       }
     },
+
+    /* RENDER: L3 Phoner (Label Only)
+    ====================================== */
+    l3_phoner_label: function(button) {
+      var input = actions.getInput(button),
+          startX = 80,
+          startY = 500,
+          squareDimensions = 170,
+          marginRight = 20,
+          rectOpacity = 1,
+          rectPadding = {
+            top: 5,
+            right: 40,
+            bottom: 20,
+            left: 20
+          };
+
+      if (content.image != null) startX += squareDimensions + marginRight;
+      settings.context.clearRect(startX, startY, (settings.width - startX), 33 + rectPadding.top + rectPadding.bottom); // Deletes phoner text previously drawn, leaving behind transparent canvas
+
+      // If either "On the Phone" or "Voice Of" is checked, draw label
+      if (document.getElementById("OnthePhone").checked) {
+        actions.addTextWithRect("On the Phone", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
+      } else if (document.getElementById("VoiceOf").checked) {
+        actions.addTextWithRect("Voice Of", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
+      }
+    },
+
 
     /* RENDER: Portrait
     ====================================== */
