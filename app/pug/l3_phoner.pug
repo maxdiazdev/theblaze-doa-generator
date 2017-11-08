@@ -19,21 +19,29 @@ html(lang="en")
         canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template="l3_phoner")
       section.generator__controls
         fieldset.generator__fieldset.generator__fieldset
-          label.generator__directions Upload a portrait-oriented photo. It's optional.
+          span.generator__directions Upload a portrait-oriented photo. It's optional.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button" onclick="generator.l3_phoner(this)") Choose Image
         fieldset.generator__fieldset
-          label.generator__directions Add phoner's name and their description.
-          span.generator__label Label
-          input.generator__input.generator__input--text(type="text" placeholder="Example: On the Phone" data-font-size="33" data-font-weight="800")
+          span.generator__directions Add phoner's name and their description.
           span.generator__label Name
           input.generator__input.generator__input--text(type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="800")
           span.generator__label Description
           input.generator__input.generator__input--text(type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400")
           button.generator__button(type="button" onclick="generator.l3_phoner(this)") Add Text Group
+        fieldset.generator__fieldset
+          span.generator__directions Choose a label to place above phoner's name.
+          .generator__selection
+            input#OnthePhone(type="radio" name="phoner-status" value="On the Phone" checked)
+            label(for="OnthePhone") On the Phone
+            input#VoiceOf(type="radio" name="phoner-status" value="Voice Of")
+            label(for="VoiceOf") Voice Of
+            input#None(type="radio" name="phoner-status" value="None")
+            label(for="None") None
+          button.generator__button(type="button" onclick="generator.l3_phoner_label(this)") Update Label
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Name your file. All files save as .png.
+          span.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Example: L3-PHONER_John-Smith" disabled)
           button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
   script(src="js/font-detect.js")

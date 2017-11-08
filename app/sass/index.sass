@@ -188,6 +188,27 @@ input[type="range"]
   &:focus::-ms-fill-upper
     background-color: $handle-color
 
+input[type="radio"]
+  display: none
+
+input[type="radio"] + label
+  display: block
+  min-height: 50px
+  padding-top: 15px
+  padding-left: 50px
+  margin-bottom: 10px
+  background:
+    color: #ededed
+    image: url("../img/icons/icon-unchecked.png")
+    repeat: no-repeat
+    position: 10px center
+    size: 25px
+  cursor: pointer
+  font-size: 18px
+
+input[type="radio"]:checked + label
+  background-image: url("../img/icons/icon-checked.png")
+
 img
   width: 100%
   display: block
@@ -335,6 +356,10 @@ img
     font-size: 22px
     font-weight: 800
     color: $theme-black
+
+  &__selection
+    width: 100%
+    padding-bottom: 10px
 
   &__footer
     width: 100%

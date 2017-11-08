@@ -190,6 +190,29 @@ input[type="range"]:focus::-ms-fill-upper {
   background-color: white;
 }
 
+input[type="radio"] {
+  display: none;
+}
+
+input[type="radio"] + label {
+  display: block;
+  min-height: 50px;
+  padding-top: 15px;
+  padding-left: 50px;
+  margin-bottom: 10px;
+  background-color: #ededed;
+  background-image: url("../img/icons/icon-unchecked.png");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 25px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+input[type="radio"]:checked + label {
+  background-image: url("../img/icons/icon-checked.png");
+}
+
 img {
   width: 100%;
   display: block;
@@ -364,6 +387,11 @@ img {
   font-size: 22px;
   font-weight: 800;
   color: #333333;
+}
+
+.generator__selection {
+  width: 100%;
+  padding-bottom: 10px;
 }
 
 .generator__footer {

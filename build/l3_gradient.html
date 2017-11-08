@@ -19,13 +19,11 @@
         <canvas class="generator__canvas" id="jsGeneratorCanvas" width="1280" height="720" data-template="l3_gradient"></canvas>
       </section>
       <section class="generator__controls">
-        <fieldset class="generator__fieldset generator__fieldset">
-          <label class="generator__directions">Upload a portrait-oriented photo. It's optional.</label>
+        <fieldset class="generator__fieldset generator__fieldset"><span class="generator__directions">Upload a portrait-oriented photo. It's optional.</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
           <button class="generator__button" type="button" onclick="generator.l3_gradient(this)">Choose Image</button>
         </fieldset>
-        <fieldset class="generator__fieldset">
-          <label class="generator__directions">Drag and re-order, or remove text as needed.</label>
+        <fieldset class="generator__fieldset"><span class="generator__directions">Drag and re-order, or remove text as needed.</span>
           <div id="jsSortable">
             <div class="js-sortable-item"><span class="generator__label">Heading</span>
               <input class="generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="800"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
@@ -39,8 +37,7 @@
           </div>
           <button class="generator__button" type="button" onclick="generator.l3_gradient(this)">Add Text Group</button>
         </fieldset>
-        <fieldset class="generator__fieldset">
-          <label class="generator__directions">Name your file. All files save as .png.</label>
+        <fieldset class="generator__fieldset"><span class="generator__directions">Name your file. All files save as .png.</span>
           <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here.">
           <button class="generator__button" type="button" onclick="generator.download(this)">Download File</button>
         </fieldset>

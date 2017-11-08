@@ -19,17 +19,17 @@ html(lang="en")
         canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template="fs_side-by-side")
       section.generator__controls
         fieldset.generator__fieldset
-          label.generator__directions Upload left portrait-oriented photo.
+          span.generator__directions Upload left portrait-oriented photo.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button" onclick="generator.sideBySide(this)" data-fs-side="left") Choose Image
         fieldset.generator__fieldset
-          label.generator__directions Upload right portrait-oriented photo.
+          span.generator__directions Upload right portrait-oriented photo.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
           button.generator__button(type="button" onclick="generator.sideBySide(this)" data-fs-side="right") Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
-          label.generator__directions Name your file. All files save as .png.
+          span.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
           button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
   script(src="js/font-detect.js")
