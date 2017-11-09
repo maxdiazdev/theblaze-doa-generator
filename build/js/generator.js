@@ -635,7 +635,7 @@ var generator = (function() {
       if (input.type == "file") {
         actions.getFile(input, function() {
           var maxHeight = 170,
-              newImageWidth = content.image.ratio * maxHeight;
+              newImageWidth = maxHeight * content.image.ratio;
 
           actions.clearCanvas();
           actions.addBottomGradient(1/4);
@@ -801,7 +801,7 @@ var generator = (function() {
       var input = actions.getInput(button);
       actions.getFile(input, function() {
         var maxWidth = (settings.width / 2) - (settings.width / 25),
-            newImageWidth = content.image.ratio * settings.height;
+            newImageWidth = settings.height * content.image.ratio;
 
         if (content.image.ratio <= 1) {
           actions.clearCanvas();
@@ -859,17 +859,15 @@ var generator = (function() {
       });
     },
 
-    /* RENDER: Landscape
+    /* RENDER: No Crop
     ====================================== */
     noCrop: function(button) {
       var input = actions.getInput(button);
       actions.getFile(input, function() {
         var maxImageHeight = settings.height,
-            newImageWidth = content.image.ratio * maxImageHeight,
+            newImageWidth = maxImageHeight * content.image.ratio,
             startX = (settings.width - newImageWidth) / 2,
             startY = 0;
-
-        console.log("maxImageHeight: " + maxImageHeight + ", newImageWidth: " + newImageWidth + ", startX: " + startX + ", startY: " + startY);
 
         actions.clearCanvas();
         actions.clearInputs();
@@ -881,9 +879,11 @@ var generator = (function() {
         } else {
           // Reverse, set width to 720 and allow flexible height
           newImageWidth = settings.width;
-          maxImageHeight = content.image.ratio * newImageWidth;
-          startX = settings.width / 2;
+          maxImageHeight = newImageWidth / content.image.ratio; // https://eikhart.com/blog/aspect-ratio-calculator
+          startX = 0;
           startY = (settings.height - maxImageHeight) / 2;
+
+          console.log("Extreme landscape. newImageWidth: " + newImageWidth + ", maxImageHeight: " + maxImageHeight + ", startX: " + startX + ", startY: " + startY);
 
           settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
         }
