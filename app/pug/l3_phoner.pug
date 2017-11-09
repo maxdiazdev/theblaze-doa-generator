@@ -31,14 +31,12 @@ html(lang="en")
           input.generator__input.generator__input--text(type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400")
           button.generator__button(type="button" onclick="generator.l3_phoner(this)") Add Text Group
         fieldset.generator__fieldset
-          span.generator__directions Choose a label to place above phoner's name.
+          span.generator__directions Choose a different label for your phoner, if needed.
           .generator__selection
             input#OnthePhone(type="radio" name="phoner-status" value="On the Phone" checked)
             label(for="OnthePhone") On the Phone
             input#VoiceOf(type="radio" name="phoner-status" value="Voice Of")
-            label(for="VoiceOf") Voice Of
-            input#None(type="radio" name="phoner-status" value="None")
-            label(for="None") None
+            label(for="VoiceOf") Voice of
           button.generator__button(type="button" onclick="generator.l3_phoner_label(this)") Update Label
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Name your file. All files save as .png.
