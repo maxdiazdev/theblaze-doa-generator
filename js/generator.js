@@ -741,7 +741,7 @@ var generator = (function() {
           if (document.getElementById("OnthePhone").checked) {
             actions.addTextWithRect("On the Phone", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
           } else if (document.getElementById("VoiceOf").checked) {
-            actions.addTextWithRect("Voice Of", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
+            actions.addTextWithRect("Voice of", 33, 800, "white", startX, startY, "black", rectOpacity, rectPadding);
           }
 
           /*
