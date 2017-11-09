@@ -872,7 +872,13 @@ var generator = (function() {
         actions.clearCanvas();
         actions.clearInputs();
         content.slice = null; // Reset courtesy slices
-        settings.context.fillStyle = "black";
+
+        if (settings.template == "fs_tweet") {
+          settings.context.fillStyle = "white";
+        } else {
+          settings.context.fillStyle = "black";
+        }
+
         settings.context.fillRect(0, 0, settings.width, settings.height);
         if (newImageWidth <= settings.width) {
           settings.context.drawImage(content.image, startX, startY, newImageWidth, maxImageHeight);
