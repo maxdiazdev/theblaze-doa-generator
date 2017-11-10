@@ -362,11 +362,18 @@ var generator = (function() {
     /* ACTIONS: Get Input
     ====================================== */
     getFile: function(input, callback) {
-      input.click();
+      console.log("ACTIONS.GETFILE ENTERED");
+
       input.onchange = function(event) {
         event = event || window.event; // Cross-browser compatibility
+        console.log("INPUT.ONCHANGE ENTERED. EVENT IS: " + event);
         actions.readFile(event, input, callback);
       };
+
+      // Fixes IE, Edge clicking the input before it is assigned the onchange event
+      setTimeout(function() {
+        input.click();
+      }, 200);
     },
 
     /* ACTIONS: Get Input
@@ -607,6 +614,7 @@ var generator = (function() {
     ====================================== */
     landscape: function(button) {
       var input = actions.getInput(button);
+
       actions.getFile(input, function() {
         if (content.image.ratio > 1) {
           actions.clearCanvas();
