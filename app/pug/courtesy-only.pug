@@ -21,12 +21,12 @@ html(lang="en")
         fieldset.generator__fieldset
           span.generator__directions Add a courtesy to your graphic.
           input.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here.")
-          button.generator__button(type="button" onclick="generator.courtesy(this)") Add Courtesy
+          button.generator__button(type="button" onclick="generate.presets.courtesy(this)") Add Courtesy
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
-          button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
-  // script(src="js/font-detect.js")
-  // script(src="js/canvas-to-blob.min.js")
-  // script(src="js/file-saver.min.js")
+          button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
+  script(src="js/font-detect.js")
+  script(src="js/canvas-to-blob.min.js")
+  script(src="js/file-saver.min.js")
   script(src="js/generator-new.js")

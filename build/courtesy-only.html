@@ -21,17 +21,17 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset"><span class="generator__directions">Add a courtesy to your graphic.</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Type a courtesy here.">
-          <button class="generator__button" type="button" onclick="generator.courtesy(this)">Add Courtesy</button>
+          <button class="generator__button" type="button" onclick="generate.presets.courtesy(this)">Add Courtesy</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Name your file. All files save as .png.</span>
           <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
-          <button class="generator__button" type="button" onclick="generator.download(this)" disabled>Download File</button>
+          <button class="generator__button" type="button" onclick="generate.download(this)" disabled>Download File</button>
         </fieldset>
       </section>
     </div>
   </body>
-  <!-- script(src="js/font-detect.js")-->
-  <!-- script(src="js/canvas-to-blob.min.js")-->
-  <!-- script(src="js/file-saver.min.js")-->
+  <script src="js/font-detect.js"></script>
+  <script src="js/canvas-to-blob.min.js"></script>
+  <script src="js/file-saver.min.js"></script>
   <script src="js/generator-new.js"></script>
 </html>
