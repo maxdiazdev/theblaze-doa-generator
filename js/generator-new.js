@@ -277,6 +277,7 @@ var generate = (function() {
 
         if (courtesy.length > 0) {
           if (!isHelveticaNeue) {
+            fontSize = 28;
             fontWeight = 800;
           }
 
