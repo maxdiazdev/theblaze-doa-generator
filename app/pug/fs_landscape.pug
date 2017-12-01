@@ -22,16 +22,16 @@ html(lang="en")
           span.generator__directions Upload a landscape-oriented photo.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button(type="button" onclick="generator.landscape(this)") Choose Image
+          button.generator__button(type="button" onclick="generate.presets.landscape(this)") Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Add a courtesy to your graphic. It's optional.
           input.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here." disabled)
-          button.generator__button(type="button" onclick="generator.courtesy(this)" disabled) Add Courtesy
+          button.generator__button(type="button" onclick="generate.presets.courtesy(this)" disabled) Add Courtesy
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Name your file. All files save as .png.
           input.js-file-name.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
-          button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
+          button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
   script(src="js/font-detect.js")
   script(src="js/canvas-to-blob.min.js")
   script(src="js/file-saver.min.js")
-  script(src="js/generator.js")
+  script(src="js/generator-new.js")
