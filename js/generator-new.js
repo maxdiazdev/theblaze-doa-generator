@@ -17,20 +17,55 @@ var generate = (function() {
     }
   };
 
-  // Check for Helvetica Neue using font-detect.js
+  // Prepare boolean to check for Helvetica Neue
+  var isHelveticaNeue = false;
+
+  // Use font-detect.js to determine if the font exists
   try {
-    var isHelveticaNeue = new Detector();
+    isHelveticaNeue = new Detector();
     isHelveticaNeue = isHelveticaNeue.detect("Helvetica Neue");
     console.log(isHelveticaNeue ? "\"Helvetica Neue\" detected." : "\"Helvetica Neue\" NOT detected.");
   } catch(err) {
     console.log("Missing font-detect.js file: http://www.lalit.org/lab/javascript-css-font-detect/");
   }
 
+  // Courtesy values
+  var courtesy = {
+    fontSize: isHelveticaNeue ? 30 : 28,
+    fontWeight: isHelveticaNeue ? 500 : 800,
+    fontColor: "white",
+    startX: 100,
+    startY: 34,
+    rectColor: "black",
+    rectOpacity: 0.5,
+    rectPadding: {
+      top: 18,
+      right: 16,
+      bottom: 18,
+      left: 16
+    }
+  };
+
+  // Store drawn text or images as needed, throughout the app
+  var saved = {};
+
   // Private
   function _getButtonInput(button) {
     parent = button.parentElement;
     input = parent.querySelector("input");
     return input;
+  }
+
+  function _getImageFile(input, callback) {
+    input.onchange = function(event) {
+      event = event || window.event; // Cross-browser compatibility
+      _readImageFile(event, input, callback);
+    };
+
+    // Fixes IE, Edge clicking the input before it is assigned the onchange event
+    setTimeout(function() {
+      input.click();
+    }, 200);
   }
 
   function _matchSocial(string) {
@@ -63,6 +98,33 @@ var generate = (function() {
     }
 
     return social;
+  }
+
+  function _readImageFile(event, input, callback) {
+    var file = input.files[0],
+        reader = new FileReader(),
+        image = new Image(),
+        display = input.parentElement.querySelector(".generator__input--image");
+
+    if (file) {
+      reader.onload = function(event) {
+        image.onload = function() {
+          console.log("image.width: " + image.width + ", image.height: " + image.height);
+        };
+
+        // Must be image.src, see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+        image.src = event.target.result;
+      };
+
+      reader.readAsDataURL(event.target.files[0]);
+
+      setTimeout(function() {
+        saved.image = image;
+        saved.image.ratio = image.width / image.height;
+        display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
+        callback();
+      }, 400); // Set to 400 to give time for uploads from the server. Used to be 200.
+    }
   }
 
   // Public
@@ -170,6 +232,69 @@ var generate = (function() {
       }
     },
 
+    image: {
+      fit: function(image, optDestWidth, optDestHeight, optStartX, optStartY, optOffsetCropX, optOffsetCropY) {
+        // Source: https://stackoverflow.com/questions/21961839/simulation-background-size-cover-in-canvas
+
+        var context = settings.context,
+            highestRatio = 0,
+            newImageWidth = 0,
+            newImageHeight = 0,
+            croppedAtX, subRectY, subRectWidth, subRectHeight, aspectRatio = 1;
+
+        // If only image is provided, default destination is canvas, starting from the top-left corner, with the image cropped to fit and centered
+        optDestWidth = optDestWidth || settings.width;
+        optDestHeight = optDestHeight || settings.height;
+        optStartX = optStartX || 0;
+        optStartY = optStartY || 0;
+        optOffsetCropX = optOffsetCropX || 0.5;
+        optOffsetCropY = optOffsetCropY || 0.5;
+
+        // Keep bounds [0.0, 1.0]
+        if (optOffsetCropX < 0) optOffsetCropX = 0;
+        if (optOffsetCropY < 0) optOffsetCropY = 0;
+        if (optOffsetCropX > 1) optOffsetCropX = 1;
+        if (optOffsetCropY > 1) optOffsetCropY = 1;
+
+        highestRatio = Math.min(optDestWidth / image.width, optDestHeight / image.height);
+        newImageWidth = image.width * highestRatio;
+        newImageHeight = image.height * highestRatio;
+
+        // Decide which gap to fill
+        if (newImageWidth < optDestWidth) aspectRatio = optDestWidth / newImageWidth;
+        if (Math.abs(aspectRatio - 1) < 1e-14 && newImageHeight < optDestHeight) aspectRatio = optDestHeight / newImageHeight;
+
+        newImageWidth *= aspectRatio;
+        newImageHeight *= aspectRatio;
+
+        // Calc source rectangle
+        croppedImageWidth = image.width / (newImageWidth / optDestWidth);
+        croppedImageHeight = image.height / (newImageHeight / optDestHeight);
+        croppedAtX = (image.width - croppedImageWidth) * optOffsetCropX;
+        croppedAtY = (image.height - croppedImageHeight) * optOffsetCropY;
+
+        // Make sure source rectangle is valid
+        if (croppedAtX < 0) croppedAtX = 0;
+        if (croppedAtY < 0) croppedAtY = 0;
+        if (croppedImageWidth > image.width) croppedImageWidth = image.width;
+        if (croppedImageHeight > image.height) croppedImageHeight = image.height;
+
+        // Fill image in dest. rectangle
+        context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, optStartX, optStartY, optDestWidth, optDestHeight);
+
+        // Save area where courtesy may go
+        saved.image.slice = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
+      },
+
+      rotate: function() {
+        //
+      },
+
+      adjust: function () {
+        //
+      }
+    },
+
     text: {
       withBg: function(string, optFontSize, optFontWeight, optFontColor, optStartX, optStartY, optRectColor, optRectOpacity, optRectPadding) {
         // Source: https://stackoverflow.com/questions/18900117/write-text-on-canvas-with-background
@@ -260,39 +385,43 @@ var generate = (function() {
 
     presets: {
       courtesy: function(button) {
-        var courtesy = _getButtonInput(button).value,
-            fontSize = 30,
-            fontWeight = 500,
-            fontColor = "White",
-            startX = 100,
-            startY = 34,
-            rectColor = "black",
-            rectOpacity = 0.5,
-            rectPadding = {
-              top: 16,
-              right: 18,
-              bottom: 16,
-              left: 18
-            };
+        var string = _getButtonInput(button).value;
 
-        if (courtesy.length > 0) {
-          if (!isHelveticaNeue) {
-            fontSize = 28;
-            fontWeight = 800;
+        if (string.length > 0) {
+
+          // Delete previous courtesy, if any
+          settings.context.clearRect(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
+
+          // Restore the underlying image, if any
+          if (saved.image) {
+            settings.context.putImageData(saved.image.slice,  courtesy.startX, courtesy.startY);
           }
 
-          if (settings.template == "courtesy") {
-            exports.clear.canvas();
+          // Draw new courtesy
+          exports.text.withBg(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.rectColor, courtesy.rectOpacity, courtesy.rectPadding);
 
-            exports.text.withBg(courtesy, fontSize, fontWeight, fontColor, startX, startY, rectColor, rectOpacity, rectPadding);
+          // Save new courtesy
+          saved.courtesy = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
 
-            exports.enable.inputs();
-          } else {
-            exports.text.withBg(courtesy, fontSize, fontWeight, fontColor, startX, startY, rectColor, rectOpacity, rectPadding);
-          }
+          exports.enable.inputs();
         } else {
           alert("Courtesy field is empty. Please enter text before submitting.");
         }
+      },
+
+      landscape: function(button) {
+        var input = _getButtonInput(button);
+
+        _getImageFile(input, function() {
+          if (saved.image.ratio > 1) {
+            exports.clear.canvas();
+            exports.clear.inputs();
+            exports.image.fit(saved.image);
+            exports.enable.inputs();
+          } else {
+            alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
+          }
+        });
       }
     }
   };
