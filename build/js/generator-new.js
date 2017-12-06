@@ -50,6 +50,49 @@ var generate = (function() {
   var saved = {};
 
   // Private
+  function _addTextBg(bgDimensions, bgPadding, bgColor, bgOpacity, startX, startY) {
+
+    bgDimensions.width += bgPadding.left + bgPadding.right;
+    bgDimensions.height += bgPadding.top + bgPadding.bottom;
+
+    settings.context.fillStyle = bgColor;
+    settings.context.globalAlpha = bgOpacity;
+    settings.context.fillRect(startX, startY, bgDimensions.width, bgDimensions.height);
+    settings.context.globalAlpha = 1.0; // Reset opacity
+  }
+
+  function _createImageAdj(fieldset, axis, buttonAttr) {
+    var parent = fieldset.parentNode,
+        newFieldset = document.createElement("fieldset"),
+        labelMessage = "",
+        inputMessage = "",
+        arrowStyle = [];
+
+    if (axis == "X") {
+      labelMessage = "left or right";
+      inputMessage = "% from the left.";
+      arrowStyle = ["transform: rotate(90deg);", "transform: rotate(-90deg);"];
+    } else {
+      labelMessage = "up or down";
+      inputMessage = "% from the top.";
+      arrowStyle = ["transform: rotate(0deg);", "transform: rotate(180deg);"];
+    }
+
+    newFieldset.className = "generator__fieldset";
+    newFieldset.className += " js-generator-pos-fieldset"; // Used for _removeImageAdj function. Must include space!
+
+    if (buttonAttr) {
+      buttonAttr = "data-" + buttonAttr.name + "='" + buttonAttr.value + "'";
+    } else {
+      buttonAttr = "";
+    }
+
+    newFieldset.innerHTML = "<label class=\"generator__directions\">Move photo " + labelMessage + ", if needed.</label><span style=\"display: block; font-size: 20px; margin-top: -15px; margin-bottom: 25px;\">Image is currently cropped <input class\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\" disabled/>" + inputMessage + "</span><button class=\"generator__button\" type=\"button\" onclick=\"generate.image.adjust(this, '" + axis + "', 'decrease')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[0] + "\"/></button><button class=\"generator__button\" type=\"button\" onclick=\"generate.image.adjust(this, '" + axis + "', 'increase')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[1] + "\"/></button>";
+
+    // Source: https://stackoverflow.com/questions/4793604/how-to-insert-an-element-after-another-element-in-javascript-without-using-a-lib
+    parent.insertBefore(newFieldset, fieldset.nextSibling);
+  }
+
   function _getButtonInput(button) {
     parent = button.parentElement;
     input = parent.querySelector("input");
@@ -69,28 +112,28 @@ var generate = (function() {
   }
 
   function _matchSocial(string) {
-    var social = {
-      image: new Image(),
-      handle: ""
-    };
+    var lowerCase = string.toLowerCase(),
+        social = {
+          image: new Image(),
+          handle: ""
+        };
 
-    string.toLowerCase();
     switch (typeof string === "string") {
-      case string.includes("@facebook"):
+      case lowerCase.includes("@facebook"):
         social.image.src = "img/icons/icon-facebook.png";
-        social.handle = string.replace("facebook ", "");
+        social.handle = string.replace(/facebook /i, "");
         break;
-      case string.includes("@twitter"):
+      case lowerCase.includes("@twitter"):
         social.image.src = "img/icons/icon-twitter.png";
-        social.handle = string.replace("twitter ", "");
+        social.handle = string.replace(/twitter /i, "");
         break;
-      case string.includes("@instagram"):
+      case lowerCase.includes("@instagram"):
         social.image.src = "img/icons/icon-instagram.png";
-        social.handle = string.replace("instagram ", "");
+        social.handle = string.replace(/instagram /i, "");
         break;
-      case string.includes("@youtube"):
+      case lowerCase.includes("@youtube"):
         social.image.src = "img/icons/icon-youtube.png";
-        social.handle = string.replace("@youtube ", "");
+        social.handle = string.replace(/@youtube /i, "");
         break;
       default:
         social = false;
@@ -124,6 +167,14 @@ var generate = (function() {
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         callback();
       }, 400); // Set to 400 to give time for uploads from the server. Used to be 200.
+    }
+  }
+
+  function _removeImageAdj(fieldset) {
+    var sibling = fieldset.nextElementSibling;
+
+    if (sibling.classList.contains("js-generator-pos-fieldset")) {
+      sibling.remove();
     }
   }
 
@@ -247,8 +298,9 @@ var generate = (function() {
         optDestHeight = optDestHeight || settings.height;
         optStartX = optStartX || 0;
         optStartY = optStartY || 0;
-        optOffsetCropX = optOffsetCropX || 0.5;
-        optOffsetCropY = optOffsetCropY || 0.5;
+
+        optOffsetCropX = typeof optOffsetCropX === "number" ? optOffsetCropX : 0.5;
+        optOffsetCropY = typeof optOffsetCropY === "number" ? optOffsetCropY : 0.5;
 
         // Keep bounds [0.0, 1.0]
         if (optOffsetCropX < 0) optOffsetCropX = 0;
@@ -283,125 +335,123 @@ var generate = (function() {
         context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, optStartX, optStartY, optDestWidth, optDestHeight);
 
         // Save area where courtesy may go
-        saved.image.slice = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
+        // saved.image.slice = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
       },
 
       rotate: function() {
         //
       },
 
-      adjust: function () {
-        //
-      }
-    },
+      adjust: function(button, axis, action) {
+        var input = _getButtonInput(button),
+            value = Number(input.value);
 
-    text: {
-      withBg: function(string, optFontSize, optFontWeight, optFontColor, optStartX, optStartY, optRectColor, optRectOpacity, optRectPadding) {
-        // Source: https://stackoverflow.com/questions/18900117/write-text-on-canvas-with-background
-
-        var rectWidth = 0,
-            rectHeight = 0,
-            lineHeight = settings.font.lineHeight,
-            textHeight = 0;
-
-        // Default values
-        optFontSize = optFontSize || 40;
-        optFontWeight = optFontWeight || 400;
-        optFontColor = optFontColor || "white";
-        optStartX = optStartX || 0;
-        optStartY = optStartY || 0;
-        optRectColor = optRectColor || "black";
-        optRectOpacity = optRectOpacity || 1;
-        optRectPadding = optRectPadding || {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0
-        };
-
-        // Get text's line-height to exclude it from text's height
-        lineHeight *= optFontSize;
-        textHeight = optFontSize - lineHeight;
-
-        settings.context.font = optFontWeight + " " + optFontSize + "px " + settings.font.family;
-        settings.context.textBaseline = "alphabetical";  // Better cross-browser support, particularly in Firefox: https://stackoverflow.com/questions/35407614/html5-canvas-textbaseline-top-looks-different-in-firefox-and-chrome#45518362
-        settings.context.fillStyle = optRectColor;
-
-        // Set after context.font so string width is measured accurately
-        rectWidth += settings.context.measureText(string).width + optRectPadding.left + optRectPadding.right;
-        rectHeight = textHeight + optRectPadding.top + optRectPadding.bottom;
-
-        // Assume these values represent a courtesy
-        if (optFontSize == 30 && optRectOpacity == 0.5) {
-          // Save the courtesy's destination before it is drawn! That way we can erase it without clearing the entire canvas.
-          // actions.saveCourtesyArea(rectWidth, rectHeight);
+        if (action == "decrease" && value > 0) {
+          value -= 10;
+          input.value = value;
+        } else if (action == "increase" && value < 100) {
+          value += 10;
+          input.value = value;
         }
 
-        settings.context.globalAlpha = optRectOpacity;
-        settings.context.fillRect(optStartX, optStartY, rectWidth, rectHeight);
-        settings.context.globalAlpha = 1.0; // Reset opacity
-        settings.context.fillStyle = optFontColor;
+        // Change value to decimal for generate.image.fit
+        value /= 100;
 
-        settings.context.fillText(string, (optStartX + optRectPadding.left), (optStartY + textHeight + optRectPadding.top)); // textHeight is added to optStartY to counter-act alphabetic baseline
-      },
-
-      withoutBg: function(string, optFontSize, optFontWeight, optFontColor, optStartX, optStartY) {
-        var social = "",
-            lineHeight = settings.font.lineHeight,
-            textHeight = 0;
-
-        // Default values
-        optFontSize = optFontSize || 40;
-        optFontWeight = optFontWeight || 400;
-        optFontColor = optFontColor || "black";
-        optStartX = optStartX || 0;
-        optStartY = optStartY || 0;
-
-        // Get text's line-height to exclude it from text's height
-        lineHeight *= optFontSize;
-        textHeight = optFontSize - lineHeight;
-
-        if (string.length > 0) {
-          social = _matchSocial(string);
-
-          settings.context.font = optFontWeight + " " + optFontSize + "px " + settings.font.family;
-          settings.context.textBaseline = "alphabetic"; // Better cross-browser support, particularly in Firefox: https://stackoverflow.com/questions/35407614/html5-canvas-textbaseline-top-looks-different-in-firefox-and-chrome#45518362
-          settings.context.fillStyle = optFontColor;
-
-          if (social) {
-            social.image.onload = function() {
-              var squareDimensions = optFontSize,
-                  marginRight = 10;
-
-              settings.context.drawImage(social.image, optStartX, optStartY, squareDimensions, squareDimensions);
-              settings.context.fillText(social.handle, (optStartX + squareDimensions + marginRight), (optStartY + textHeight)); // textHeight is added to optStartY to counter-act alphabetic baseline
-            };
-          } else {
-            settings.context.fillText(string, optStartX, (optStartY + textHeight)); // textHeight is added to optStartY to counter-act alphabetic baseline
+        //
+        if (axis == "X") {
+          //
+        } else {
+          switch (settings.template) {
+            case "fs_landscape":
+              break;
+            default:
+              console.log("Could not find match for settings.template. Make sure it's set on this page.");
+              break;
           }
         }
       }
     },
 
+    text: function(string, optFontSize, optFontWeight, optFontColor, optStartX, optStartY, optBgPadding, optBgColor, optBgOpacity) {
+      var social = _matchSocial(string),
+          textHeight = 0,
+          lineHeight = settings.font.lineHeight,
+          bgDimensions = {
+            width: 0,
+            height: 0
+          };
+
+      // Default values
+      optFontSize = optFontSize || 40;
+      optFontWeight = optFontWeight || 400;
+      optFontColor = optFontColor || "black";
+      optStartX = optStartX || 0;
+      optStartY = optStartY || 0;
+
+      // Get text's line-height to exclude it from text's height
+      lineHeight *= optFontSize;
+      textHeight = optFontSize - lineHeight;
+
+      // Set the font on context
+      settings.context.font = optFontWeight + " " + optFontSize + "px " + settings.font.family;
+      settings.context.textBaseline = "alphabetical";  // Better cross-browser support, particularly in Firefox: https://stackoverflow.com/questions/35407614/html5-canvas-textbaseline-top-looks-different-in-firefox-and-chrome#45518362
+      settings.context.fillStyle = optBgColor;
+
+      if (social) {
+        social.size = textHeight;
+        social.margin = lineHeight / 2; // Create space between social icon and text that's proportionate to the text's font-size
+
+        social.image.onload = function() {
+          settings.context.drawImage(social.image, optStartX, optStartY, social.size, social.size);
+        };
+
+        string = social.handle;
+      } else {
+        social.size = 0;
+        social.margin = 0;
+      }
+
+      // Prepare background, if any
+      if (optBgPadding) {
+        bgDimensions.width = settings.context.measureText(string).width + social.size + social.margin;
+        bgDimensions.height = textHeight;
+
+        _addTextBg(bgDimensions, optBgPadding, optBgColor, optBgOpacity, optStartX, optStartY);
+
+        // Push text according to padding
+        optStartX += optBgPadding.left;
+        optStartY += optBgPadding.top;
+      }
+
+      settings.context.fillStyle = optFontColor;
+      settings.context.fillText(string, (optStartX + social.size + social.margin), (optStartY + textHeight));
+    },
+
     presets: {
-      courtesy: function(button) {
-        var string = _getButtonInput(button).value;
+      courtesy: function(string) {
+        // If argument is a button, then get its corresponding input's value. Not clean, but the best implementation I could think of to keep things DRY.
+        if (typeof string == "object") {
+          string = _getButtonInput(string).value;
+        }
 
         if (string.length > 0) {
 
           // Delete previous courtesy, if any
-          settings.context.clearRect(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
+          settings.context.clearRect(courtesy.startX, courtesy.startY, courtesy.width, courtesy.height);
 
           // Restore the underlying image, if any
-          if (saved.image) {
-            settings.context.putImageData(saved.image.slice,  courtesy.startX, courtesy.startY);
-          }
+          // if (saved.image) {
+          //   settings.context.putImageData(saved.image.slice,  courtesy.startX, courtesy.startY);
+          // }
 
           // Draw new courtesy
           exports.text.withBg(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.rectColor, courtesy.rectOpacity, courtesy.rectPadding);
 
           // Save new courtesy
-          saved.courtesy = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
+          saved.courtesy = {
+            area: settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom)),
+            message: string
+          };
 
           exports.enable.inputs();
         } else {
@@ -415,13 +465,23 @@ var generate = (function() {
         _getImageFile(input, function() {
           if (saved.image.ratio > 1) {
             exports.clear.canvas();
+            _removeImageAdj(button.parentElement);
             exports.clear.inputs();
             exports.image.fit(saved.image);
+
+            if (saved.image.ratio != settings.width / settings.height) {
+              _createImageAdj(button.parentElement, "Y");
+            }
+
             exports.enable.inputs();
           } else {
             alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
           }
         });
+      },
+
+      portrait: function(button) {
+        //
       }
     }
   };
