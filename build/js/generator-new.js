@@ -36,31 +36,20 @@ var generate = (function() {
     fontColor: "white",
     startX: 100,
     startY: 34,
-    rectColor: "black",
-    rectOpacity: 0.5,
     rectPadding: {
       top: 18,
       right: 16,
       bottom: 18,
       left: 16
-    }
+    },
+    rectColor: "black",
+    rectOpacity: 0.5
   };
 
   // Store drawn text or images as needed, throughout the app
   var saved = {};
 
   // Private
-  function _addTextBg(bgDimensions, bgPadding, bgColor, bgOpacity, startX, startY) {
-
-    bgDimensions.width += bgPadding.left + bgPadding.right;
-    bgDimensions.height += bgPadding.top + bgPadding.bottom;
-
-    settings.context.fillStyle = bgColor;
-    settings.context.globalAlpha = bgOpacity;
-    settings.context.fillRect(startX, startY, bgDimensions.width, bgDimensions.height);
-    settings.context.globalAlpha = 1.0; // Reset opacity
-  }
-
   function _createImageAdj(fieldset, axis, buttonAttr) {
     var parent = fieldset.parentNode,
         newFieldset = document.createElement("fieldset"),
@@ -111,30 +100,34 @@ var generate = (function() {
     }, 200);
   }
 
-  function _matchSocial(string) {
+  function _getSocial(string) {
     var lowerCase = string.toLowerCase(),
         social = {
           image: new Image(),
           handle: ""
         };
 
-    switch (typeof string === "string") {
+    switch (typeof string == "string") {
       case lowerCase.includes("@facebook"):
         social.image.src = "img/icons/icon-facebook.png";
         social.handle = string.replace(/facebook /i, "");
         break;
+
       case lowerCase.includes("@twitter"):
         social.image.src = "img/icons/icon-twitter.png";
         social.handle = string.replace(/twitter /i, "");
         break;
+
       case lowerCase.includes("@instagram"):
         social.image.src = "img/icons/icon-instagram.png";
         social.handle = string.replace(/instagram /i, "");
         break;
+
       case lowerCase.includes("@youtube"):
         social.image.src = "img/icons/icon-youtube.png";
         social.handle = string.replace(/@youtube /i, "");
         break;
+
       default:
         social = false;
         break;
@@ -181,9 +174,9 @@ var generate = (function() {
   // Public
   var exports = {
     clear: {
-      canvas: function() {
-        settings.context.clearRect(0, 0, settings.width, settings.height);
-        settings.context.beginPath(); // Essential to clear rectangles, images, etc.
+      canvas: function(context) {
+        context.clearRect(0, 0, settings.width, settings.height);
+        context.beginPath(); // Essential to clear rectangles, images, etc.
       },
 
       inputs: function() {
@@ -197,7 +190,8 @@ var generate = (function() {
 
     download: function(button) {
       var fileName = _getButtonInput(button).value,
-          dataURL = false;
+          dataURL = false,
+          tempCanvas = document.getElementById("jsTempCanvas") || false;
 
       if (fileName) {
         if (canvas.toBlob) {
@@ -333,9 +327,6 @@ var generate = (function() {
 
         // Fill image in dest. rectangle
         context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, optStartX, optStartY, optDestWidth, optDestHeight);
-
-        // Save area where courtesy may go
-        // saved.image.slice = settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom));
       },
 
       rotate: function() {
@@ -358,102 +349,117 @@ var generate = (function() {
         value /= 100;
 
         //
-        if (axis == "X") {
-          //
-        } else {
-          switch (settings.template) {
-            case "fs_landscape":
-              break;
-            default:
-              console.log("Could not find match for settings.template. Make sure it's set on this page.");
-              break;
-          }
+        switch (settings.template) {
+          case "fs_landscape":
+            exports.image.fit(saved.image, settings.width, settings.height, 0, 0, 0.5, value);
+
+            if (saved.courtesy) {
+              exports.presets.courtesy(saved.courtesy);
+            }
+            break;
+
+          case "fs_portrait":
+            exports.image.fit(saved.image, (settings.width / 2 - settings.width / 25), settings.height, (settings.width / 2), 0, value, 0.5);
+            break;
+
+          default:
+            console.log("Could not find match for settings.template. Make sure it's set on this page.");
+            break;
         }
       }
     },
 
-    text: function(string, optFontSize, optFontWeight, optFontColor, optStartX, optStartY, optBgPadding, optBgColor, optBgOpacity) {
-      var social = _matchSocial(string),
-          textHeight = 0,
-          lineHeight = settings.font.lineHeight,
-          bgDimensions = {
-            width: 0,
-            height: 0
-          };
+    text: function(string, fontSize, fontWeight, fontColor, startX, startY, optBgPadding, optBgColor, optBgOpacity) {
+      var social = _getSocial(string),
+          lineHeight = settings.font.lineHeight * fontSize,
+          textHeight = fontSize - lineHeight,
+          bgDimensions = {},
+          newCanvas = document.getElementById("jsTempCanvas") || false,
+          newContext = (newCanvas) ? newCanvas.getContext("2d") : false;
 
-      // Default values
-      optFontSize = optFontSize || 40;
-      optFontWeight = optFontWeight || 400;
-      optFontColor = optFontColor || "black";
-      optStartX = optStartX || 0;
-      optStartY = optStartY || 0;
+      if (!newCanvas) {
+        newCanvas = document.createElement("canvas");
+        newCanvas.setAttribute("id", "jsTempCanvas");
+        newCanvas.style.width = "580px";
+        newCanvas.style.height = "326px";
+        newCanvas.style.border = "5px solid #ededed";
+        newCanvas.style.borderRadius = "3px";
+        newCanvas.style.position = "relative";
+        newCanvas.style.top = "-329px";
+        newContext = newCanvas.getContext("2d");
 
-      // Get text's line-height to exclude it from text's height
-      lineHeight *= optFontSize;
-      textHeight = optFontSize - lineHeight;
+        newCanvas.width = settings.width;
+        newCanvas.height = settings.height;
+
+        canvas.parentNode.insertBefore(newCanvas, canvas.nextSibling);
+      }
 
       // Set the font on context
-      settings.context.font = optFontWeight + " " + optFontSize + "px " + settings.font.family;
-      settings.context.textBaseline = "alphabetical";  // Better cross-browser support, particularly in Firefox: https://stackoverflow.com/questions/35407614/html5-canvas-textbaseline-top-looks-different-in-firefox-and-chrome#45518362
-      settings.context.fillStyle = optBgColor;
+      newContext.font = fontWeight + " " + fontSize + "px " + settings.font.family;
+      newContext.textBaseline = "alphabetical";  // Better cross-browser support, particularly in Firefox: https://stackoverflow.com/questions/35407614/html5-canvas-textbaseline-top-looks-different-in-firefox-and-chrome#45518362
 
       if (social) {
         social.size = textHeight;
         social.margin = lineHeight / 2; // Create space between social icon and text that's proportionate to the text's font-size
 
         social.image.onload = function() {
-          settings.context.drawImage(social.image, optStartX, optStartY, social.size, social.size);
+          newContext.drawImage(social.image, startX, startY, social.size, social.size);
         };
 
         string = social.handle;
       } else {
-        social.size = 0;
-        social.margin = 0;
+        social = {
+          size: 0,
+          margin: 0
+        };
       }
 
-      // Prepare background, if any
       if (optBgPadding) {
-        bgDimensions.width = settings.context.measureText(string).width + social.size + social.margin;
+        bgDimensions.width = newContext.measureText(string).width;
         bgDimensions.height = textHeight;
 
-        _addTextBg(bgDimensions, optBgPadding, optBgColor, optBgOpacity, optStartX, optStartY);
+        bgDimensions.width += optBgPadding.left + optBgPadding.right;
+        bgDimensions.width += social.size + social.margin;
+        bgDimensions.height += optBgPadding.top + optBgPadding.bottom;
+
+        newContext.fillStyle = optBgColor;
+        newContext.globalAlpha = optBgOpacity;
+        newContext.fillRect(startX, startY, bgDimensions.width, bgDimensions.height);
+        newContext.globalAlpha = 1.0; // Reset opacity
 
         // Push text according to padding
-        optStartX += optBgPadding.left;
-        optStartY += optBgPadding.top;
+        startX += optBgPadding.left;
+        startY += optBgPadding.top;
       }
 
-      settings.context.fillStyle = optFontColor;
-      settings.context.fillText(string, (optStartX + social.size + social.margin), (optStartY + textHeight));
+      // Draw text
+      newContext.fillStyle = fontColor;
+      newContext.fillText(string, (startX + social.size + social.margin), (startY + textHeight)); // Add textHeight to optStartY to counter-act textBaseline "alphabetical", makes it act like "top"
     },
 
     presets: {
       courtesy: function(string) {
-        // If argument is a button, then get its corresponding input's value. Not clean, but the best implementation I could think of to keep things DRY.
+
+        // If argument is a button, then get its corresponding input's value. Otherwise, we can pass a string. Not clean, but the best implementation I could think of to keep things DRY.
         if (typeof string == "object") {
           string = _getButtonInput(string).value;
         }
 
         if (string.length > 0) {
-
-          // Delete previous courtesy, if any
-          settings.context.clearRect(courtesy.startX, courtesy.startY, courtesy.width, courtesy.height);
-
-          // Restore the underlying image, if any
-          // if (saved.image) {
-          //   settings.context.putImageData(saved.image.slice,  courtesy.startX, courtesy.startY);
-          // }
+          if (saved.courtesy) {
+            exports.clear.canvas(document.getElementById("jsTempCanvas").getContext("2d"));
+          }
 
           // Draw new courtesy
-          exports.text.withBg(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.rectColor, courtesy.rectOpacity, courtesy.rectPadding);
+          exports.text(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.rectPadding, courtesy.rectColor, courtesy.rectOpacity);
 
-          // Save new courtesy
-          saved.courtesy = {
-            area: settings.context.getImageData(courtesy.startX, courtesy.startY, (settings.width - courtesy.startX), (courtesy.fontSize + courtesy.rectPadding.top + courtesy.rectPadding.bottom)),
-            message: string
-          };
+          // Save new courtesy message
+          saved.courtesy = string;
 
-          exports.enable.inputs();
+          if (settings.template == "courtesy") {
+            exports.enable.inputs();
+          }
+
         } else {
           alert("Courtesy field is empty. Please enter text before submitting.");
         }
@@ -464,7 +470,7 @@ var generate = (function() {
 
         _getImageFile(input, function() {
           if (saved.image.ratio > 1) {
-            exports.clear.canvas();
+            exports.clear.canvas(settings.context);
             _removeImageAdj(button.parentElement);
             exports.clear.inputs();
             exports.image.fit(saved.image);
@@ -481,7 +487,37 @@ var generate = (function() {
       },
 
       portrait: function(button) {
-        //
+        var input = _getButtonInput(button);
+
+        _getImageFile(input, function() {
+          var maxWidth = (settings.width / 2) - (settings.width / 25),
+              newImageWidth = settings.height * saved.image.ratio;
+
+            if (saved.image.ratio <= 1) {
+              exports.clear.canvas(settings.context);
+              _removeImageAdj(button.parentElement);
+              exports.clear.inputs();
+
+              // Background
+              settings.context.fillStyle = "black";
+              settings.context.fillRect(0, 0, settings.width, settings.height);
+              settings.context.filter = "grayscale(100%) brightness(50%) blur(5px)";
+              exports.image.fit(saved.image);
+
+              // Foreground
+              settings.context.filter = "none";
+              if (newImageWidth > maxWidth) {
+                exports.image.fit(saved.image, maxWidth, settings.height, (settings.width / 2), 0);
+                _createImageAdj(button.parentElement, "X");
+              } else {
+                settings.context.drawImage(saved.image, (settings.width / 2), 0, newImageWidth, settings.height);
+              }
+
+              exports.enable.inputs();
+            } else {
+              alert("This image is LANDSCAPE-oriented. Please use the fs_landscape template instead.");
+            }
+        });
       }
     }
   };
