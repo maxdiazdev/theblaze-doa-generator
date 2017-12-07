@@ -21,15 +21,15 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset"><span class="generator__directions">Upload a portrait-oriented or square photo.</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" onclick="generator.portrait(this)">Choose Image</button>
+          <button class="generator__button" type="button" onclick="generate.presets.portrait(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Add a courtesy to your graphic. It's optional.</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Type a courtesy here." disabled>
-          <button class="generator__button" type="button" onclick="generator.courtesy(this)" disabled>Add Courtesy</button>
+          <button class="generator__button" type="button" onclick="generate.presets.courtesy(this)" disabled>Add Courtesy</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Name your file. All files save as .png.</span>
-          <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
-          <button class="generator__button" type="button" onclick="generator.download(this)" disabled>Download File</button>
+          <input class="generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
+          <button class="generator__button" type="button" onclick="generate.download(this)" disabled>Download File</button>
         </fieldset>
       </section>
     </div>
