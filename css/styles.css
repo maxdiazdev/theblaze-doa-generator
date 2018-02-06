@@ -218,26 +218,21 @@ img {
   display: block;
 }
 
+.nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .nav__button {
+  display: inline-block;
+  margin-top: 15px;
+  margin-right: 15px;
   padding: 15px;
   border-radius: 3px;
-  position: absolute;
-  top: 15px;
-  right: 15px;
   background-color: #333333;
   text-decoration: none;
   color: white;
-}
-
-.nav__button:before {
-  content: "";
-  width: 15px;
-  height: 15px;
-  margin-right: 15px;
-  display: inline-block;
-  background-image: url("../img/icons/icon-back.png");
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 .generator {

@@ -10,19 +10,19 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
   </head>
   <body>
-    <div class="nav"><a class="nav__button" href="fs_article.html">Erase Changes</a><a class="nav__button" href="index.html">Back to Templates</a></div>
+    <div class="nav"><a class="nav__button" href="fs_boxed-ad.html">Erase Changes</a><a class="nav__button" href="index.html">Back to Templates</a></div>
     <div class="generator">
       <header class="generator__header">
         <h1 class="generator__title">Create your graphic</h1>
       </header>
       <section class="generator__preview">
         <h2 class="generator__caption">Preview</h2>
-        <canvas class="generator__canvas" id="jsGeneratorCanvas" width="1280" height="720" data-template="fs_article"></canvas>
+        <canvas class="generator__canvas" id="jsGeneratorCanvas" width="1280" height="720" data-template="fs_boxed-ad"></canvas>
       </section>
       <section class="generator__controls">
-        <fieldset class="generator__fieldset"><span class="generator__directions">Upload an article screenshot that's landscape-oriented.</span>
+        <fieldset class="generator__fieldset"><span class="generator__directions">Upload a fullscreen advertisement.</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" onclick="generate.presets.article(this)">Choose Image</button>
+          <button class="generator__button" type="button" onclick="generate.presets.boxedAd(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Name your file. All files save as .png.</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
