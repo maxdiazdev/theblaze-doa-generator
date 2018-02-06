@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="images/favicon.png">
   </head>
-  <body><a class="nav__button" href="index.html">Back to Templates</a>
+  <body>
+    <div class="nav"><a class="nav__button" href="l3_phoner.html">Erase Changes</a><a class="nav__button" href="index.html">Back to Templates</a></div>
     <div class="generator">
       <header class="generator__header">
         <h1 class="generator__title">Create your graphic</h1>
@@ -21,21 +22,12 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset generator__fieldset"><span class="generator__directions">Upload a portrait-oriented photo. It's optional.</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" onclick="generator.l3_phoner(this)">Choose Image</button>
+          <button class="generator__button" type="button" onclick="generate.presets.l3PhonerImage(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset"><span class="generator__directions">Add phoner's name and their description.</span><span class="generator__label">Name</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="800"><span class="generator__label">Description</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400">
-          <button class="generator__button" type="button" onclick="generator.l3_phoner(this)">Add Text Group</button>
-        </fieldset>
-        <fieldset class="generator__fieldset"><span class="generator__directions">Choose a different label for your phoner, if needed.</span>
-          <div class="generator__selection">
-            <input id="OnthePhone" type="radio" name="phoner-status" value="On the Phone" checked>
-            <label for="OnthePhone">On the Phone</label>
-            <input id="VoiceOf" type="radio" name="phoner-status" value="Voice of">
-            <label for="VoiceOf">Voice of</label>
-          </div>
-          <button class="generator__button" type="button" onclick="generator.l3_phoner_label(this)">Update Label</button>
+          <button class="generator__button" type="button" onclick="generate.presets.l3PhonerText(this)">Add Text Group</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Name your file. All files save as .png.</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Example: L3-PHONER_John-Smith" disabled>
@@ -48,5 +40,5 @@
   <script src="js/canvas-to-blob.min.js"></script>
   <script src="js/file-saver.min.js"></script>
   <script src="js/Sortable.min.js"></script>
-  <script src="js/generator.js"></script>
+  <script src="js/generator-new.js"></script>
 </html>

@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="images/favicon.png">
   </head>
-  <body><a class="nav__button" href="index.html">Back to Templates</a>
+  <body>
+    <div class="nav"><a class="nav__button" href="fs_tweet.html">Erase Changes</a><a class="nav__button" href="index.html">Back to Templates</a></div>
     <div class="generator">
       <header class="generator__header">
         <h1 class="generator__title">Create your graphic</h1>
@@ -21,11 +22,11 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset"><span class="generator__directions">Upload your Twitter screenshot. Make sure your image has white edges!</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" onclick="generator.noCrop(this)">Choose Image</button>
+          <button class="generator__button" type="button" onclick="generate.presets.noCrop(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset generator__fieldset--disabled"><span class="generator__directions">Name your file. All files save as .png.</span>
-          <input class="js-file-name generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
-          <button class="generator__button" type="button" onclick="generator.download(this)" disabled>Download File</button>
+          <input class="generator__input generator__input--text" type="text" placeholder="Type a file name here." disabled>
+          <button class="generator__button" type="button" onclick="generate.download(this)" disabled>Download File</button>
         </fieldset>
       </section>
     </div>
@@ -33,5 +34,5 @@
   <script src="js/font-detect.js"></script>
   <script src="js/canvas-to-blob.min.js"></script>
   <script src="js/file-saver.min.js"></script>
-  <script src="js/generator.js"></script>
+  <script src="js/generator-new.js"></script>
 </html>

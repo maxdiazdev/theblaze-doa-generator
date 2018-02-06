@@ -13,7 +13,7 @@ var generate = (function() {
     font: {
       // Ideally, we could set letter-spacing here, since it seems to be tighter on Canvas than it would be in Photoshop, but support is poor: https://stackoverflow.com/questions/8952909/letter-spacing-in-canvas-element
       family: "\"Helvetica Neue\", \"tex_gyre_heros\"",
-      lineHeight: 0.285 // There is no method in Canvas to set line-height. This is a ratio of how many pixels of line-height is applied per font-size in Helvetica. Needs to be updated for Tex Gyre Heros.
+      lineHeight: 0.285 // There is no method in canvas to set line-height. This is a ratio of how many pixels of line-height is applied per font-size in Helvetica. Needs to be updated for Tex Gyre Heros.
     }
   };
 
@@ -29,27 +29,49 @@ var generate = (function() {
     console.log("Missing font-detect.js file: http://www.lalit.org/lab/javascript-css-font-detect/");
   }
 
-  // Courtesy values
-  var courtesy = {
-    fontSize: isHelveticaNeue ? 30 : 28,
-    fontWeight: isHelveticaNeue ? 500 : 800,
-    fontColor: "white",
-    startX: 100,
-    startY: 34,
-    rectPadding: {
-      top: 18,
-      right: 16,
-      bottom: 18,
-      left: 16
-    },
-    rectColor: "black",
-    rectOpacity: 0.5
-  };
-
   // Store drawn text or images as needed, throughout the app
   var saved = {};
 
   // Private
+  function _calcGCD(val, lim) {
+    // https://stackoverflow.com/questions/1186414/whats-the-algorithm-to-calculate-aspect--i-need-an-output-like-43-169
+
+    var lower = [0, 1];
+    var upper = [1, 0];
+
+    while (true) {
+      var mediant = [lower[0] + upper[0], lower[1] + upper[1]];
+
+      if (val * mediant[1] > mediant[0]) {
+          if (lim < mediant[1]) {
+              return upper;
+          }
+          lower = mediant;
+      } else if (val * mediant[1] == mediant[0]) {
+          if (lim >= mediant[1]) {
+              return mediant;
+          }
+          if (lower[1] < upper[1]) {
+              return lower;
+          }
+          return upper;
+      } else {
+          if (lim < mediant[1]) {
+              return lower;
+          }
+          upper = mediant;
+      }
+    }
+  }
+
+  function _calcAspectRatio(width, height) {
+    var gcd = _calcGCD(width / height, 50),
+        ratio = gcd[0] / gcd[1];
+
+    console.log("Aspect Ratio: " + gcd[0] + ":" + gcd[1] + ", Floating: " + ratio);
+    return ratio;
+  }
+
   function _createImageAdj(fieldset, axis, buttonAttr) {
     var parent = fieldset.parentNode,
         newFieldset = document.createElement("fieldset"),
@@ -78,8 +100,17 @@ var generate = (function() {
 
     newFieldset.innerHTML = "<label class=\"generator__directions\">Move photo " + labelMessage + ", if needed.</label><span style=\"display: block; font-size: 20px; margin-top: -15px; margin-bottom: 25px;\">Image is currently cropped <input class\"generator__input generator__input--number\" type=\"number\" min=\"0\" max=\"100\" step=\"10\" value=\"50\" disabled/>" + inputMessage + "</span><button class=\"generator__button\" type=\"button\" onclick=\"generate.image.adjust(this, '" + axis + "', 'decrease')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[0] + "\"/></button><button class=\"generator__button\" type=\"button\" onclick=\"generate.image.adjust(this, '" + axis + "', 'increase')\" " + buttonAttr + "><img src=\"img/icons/icon-arrow.png\" style=\"width: 20px; " + arrowStyle[1] + "\"/></button>";
 
-    // Source: https://stackoverflow.com/questions/4793604/how-to-insert-an-element-after-another-element-in-javascript-without-using-a-lib
     parent.insertBefore(newFieldset, fieldset.nextSibling);
+  }
+
+  function _checkBlankInputs(inputsArray) {
+    var blankInputs = 0;
+
+    inputsArray.forEach(function(input) {
+      if (!input.value) blankInputs++;
+    });
+
+    return blankInputs;
   }
 
   function _getButtonInput(button) {
@@ -145,7 +176,7 @@ var generate = (function() {
     if (file) {
       reader.onload = function(event) {
         image.onload = function() {
-          console.log("image.width: " + image.width + ", image.height: " + image.height);
+          console.log("Image Width: " + image.width + ", Image Height: " + image.height);
         };
 
         // Must be image.src, see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
@@ -155,8 +186,26 @@ var generate = (function() {
       reader.readAsDataURL(event.target.files[0]);
 
       setTimeout(function() {
-        saved.image = image;
-        saved.image.ratio = image.width / image.height;
+        // Find button if template is side-by-side
+        var button = "";
+
+        if (settings.template == "fs_side-by-side") {
+          button = input.parentElement.querySelector("button");
+
+          // Use the button to determine which side the image will go
+          if (button.dataset.fsSide == "left") {
+            saved.imageLeft = image;
+            saved.imageLeft.ratio = _calcAspectRatio(image.width, image.height);
+          } else {
+            saved.imageRight = image;
+            saved.imageRight.ratio = _calcAspectRatio(image.width, image.height);
+          }
+        } else {
+          // Otherwise, save the image as usual
+          saved.image = image;
+          saved.image.ratio = _calcAspectRatio(image.width, image.height);
+        }
+
         display.innerHTML = input.value.substring(12); // Remove "C:\fakepath\" from imageURL
         callback();
       }, 400); // Set to 400 to give time for uploads from the server. Used to be 200.
@@ -174,9 +223,9 @@ var generate = (function() {
   // Public
   var exports = {
     clear: {
-      canvas: function(context) {
-        context.clearRect(0, 0, settings.width, settings.height);
-        context.beginPath(); // Essential to clear rectangles, images, etc.
+      canvas: function() {
+        settings.context.clearRect(0, 0, settings.width, settings.height);
+        settings.context.beginPath(); // Essential to clear rectangles, images, etc.
       },
 
       inputs: function() {
@@ -190,18 +239,30 @@ var generate = (function() {
 
     download: function(button) {
       var fileName = _getButtonInput(button).value,
-          dataURL = false,
-          tempCanvas = document.getElementById("jsTempCanvas") || false;
+          newCanvas = document.createElement("canvas"), // Used as a "merged" canvas below
+          newContext = newCanvas.getContext("2d"),
+          textLayer = document.getElementById("jsTextLayer") || false;
+
+      newCanvas.width = settings.width;
+      newCanvas.height = settings.height;
 
       if (fileName) {
         if (canvas.toBlob) {
-          canvasData = canvas.toDataURL(); // Defaults to PNG
-          blob = window.dataURLtoBlob && window.dataURLtoBlob(canvasData);
-          canvas.toBlob(function (blob) {
+          // Draw first layer
+          newContext.drawImage(canvas, 0, 0);
+
+          // Draw second layer
+          if (textLayer) {
+            newContext.drawImage(textLayer, 0, 0);
+          }
+
+          newCanvasData = newCanvas.toDataURL(); // Defaults to PNG
+          blob = window.dataURLtoBlob && window.dataURLtoBlob(newCanvasData);
+          newCanvas.toBlob(function (blob) {
             saveAs(blob, fileName + ".png");
           });
         } else {
-          console.log("canvas.toBlob and it's polyfills aren't supported in this browser.");
+          console.log("newCanvas.toBlob and it's polyfills aren't supported in this browser.");
         }
       } else {
         alert("Please name your file before downloading.");
@@ -281,8 +342,7 @@ var generate = (function() {
       fit: function(image, optDestWidth, optDestHeight, optStartX, optStartY, optOffsetCropX, optOffsetCropY) {
         // Source: https://stackoverflow.com/questions/21961839/simulation-background-size-cover-in-canvas
 
-        var context = settings.context,
-            highestRatio = 0,
+        var highestRatio = 0,
             newImageWidth = 0,
             newImageHeight = 0,
             croppedAtX, subRectY, subRectWidth, subRectHeight, aspectRatio = 1;
@@ -326,11 +386,28 @@ var generate = (function() {
         if (croppedImageHeight > image.height) croppedImageHeight = image.height;
 
         // Fill image in dest. rectangle
-        context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, optStartX, optStartY, optDestWidth, optDestHeight);
+        settings.context.drawImage(image, croppedAtX, croppedAtY, croppedImageWidth, croppedImageHeight, optStartX, optStartY, optDestWidth, optDestHeight);
       },
 
-      rotate: function() {
-        //
+      rotate: function(degrees) {
+        var newCanvas = document.createElement("canvas"),
+            newContext = newCanvas.getContext("2d");
+
+        newCanvas.width = settings.width;
+        newCanvas.height = settings.height;
+
+        // Save unrotated canvas to restore later
+        newContext.save();
+
+        newContext.rotate(degrees*Math.PI/180);
+        newContext.translate(-30, 50);
+        settings.context = newContext;
+        exports.image.fit(saved.image, settings.width, settings.height, 0, 0);
+        settings.context = canvas.getContext("2d");
+        settings.context.drawImage(newCanvas, 0, 0);
+
+        // We’re done with the rotating so restore the unrotated context
+        newContext.restore();
       },
 
       adjust: function(button, axis, action) {
@@ -348,18 +425,34 @@ var generate = (function() {
         // Change value to decimal for generate.image.fit
         value /= 100;
 
-        //
+        // Re-create presets when images are adjusted
         switch (settings.template) {
           case "fs_landscape":
             exports.image.fit(saved.image, settings.width, settings.height, 0, 0, 0.5, value);
-
-            if (saved.courtesy) {
-              exports.presets.courtesy(saved.courtesy);
-            }
             break;
 
           case "fs_portrait":
             exports.image.fit(saved.image, (settings.width / 2 - settings.width / 25), settings.height, (settings.width / 2), 0, value, 0.5);
+            break;
+
+          case "l3_phoner":
+            exports.image.fit(saved.image, 170, 170, 80, 500, 0.5, value);
+            break;
+
+          case "fs_side-by-side":
+            if (axis == "X") {
+              if (button.dataset.fsSide == "left") {
+                exports.image.fit(saved.imageLeft, settings.width / 2, settings.height, 0, 0, value, 0.5);
+              } else {
+                exports.image.fit(saved.imageRight, settings.width / 2, settings.height, settings.width / 2, 0, value, 0.5);
+              }
+            } else {
+              if (button.dataset.fsSide == "left") {
+                exports.image.fit(saved.imageLeft, settings.width / 2, settings.height, 0, 0, 0.5, value);
+              } else {
+                exports.image.fit(saved.imageRight, settings.width / 2, settings.height, settings.width / 2, 0, 0.5, value);
+              }
+            }
             break;
 
           default:
@@ -374,12 +467,13 @@ var generate = (function() {
           lineHeight = settings.font.lineHeight * fontSize,
           textHeight = fontSize - lineHeight,
           bgDimensions = {},
-          newCanvas = document.getElementById("jsTempCanvas") || false,
+          newCanvas = document.getElementById("jsTextLayer") || false,
           newContext = (newCanvas) ? newCanvas.getContext("2d") : false;
 
+      // Create separate canvas and use it as a second layer for text
       if (!newCanvas) {
         newCanvas = document.createElement("canvas");
-        newCanvas.setAttribute("id", "jsTempCanvas");
+        newCanvas.setAttribute("id", "jsTextLayer");
         newCanvas.style.width = "580px";
         newCanvas.style.height = "326px";
         newCanvas.style.border = "5px solid #ededed";
@@ -438,7 +532,69 @@ var generate = (function() {
     },
 
     presets: {
+      article: function(button) {
+        var input = _getButtonInput(button);
+
+        _getImageFile(input, function() {
+          if (saved.image.ratio > 1) {
+            exports.clear.canvas();
+            settings.context.fillStyle = "white";
+            settings.context.fillRect(0, 0, settings.width, settings.height);
+            exports.image.rotate(-5);
+            exports.effects.addRadialGradient();
+            exports.enable.inputs();
+          } else {
+            alert("This image is PORTRAIT-oriented. Please submit a different screenshot.");
+          }
+        });
+      },
+
+      boxedAd: function(button) {
+        var input = _getButtonInput(button);
+
+        _getImageFile(input, function() {
+          var newWidth = 812,
+              newHeight = 457; // These are consistent, per Alexander
+
+            // Require images to be 16:9 ratio. I could adjust the lim on _calcGCD to be more forgiving instead of using a range here. See the link within that function
+            if (saved.image.ratio >= 1.7 && saved.image.ratio <= 1.8) {
+              exports.clear.canvas();
+              _removeImageAdj(button.parentElement);
+              // exports.clear.inputs();
+
+              // Background
+              settings.context.fillStyle = "black";
+              settings.context.fillRect(0, 0, settings.width, settings.height);
+              settings.context.filter = "blur(60px)";
+              exports.image.fit(saved.image);
+
+              // Foreground
+              settings.context.filter = "none";
+              settings.context.drawImage(saved.image, ((settings.width - newWidth) / 2), ((settings.height - newHeight) / 2), newWidth, newHeight);
+
+              exports.enable.inputs();
+            } else {
+              alert("This template accepts ONLY accepts 16:9 fullscreens. Example widths are: 1280 x 720.");
+            }
+        });
+      },
+
       courtesy: function(string) {
+        var courtesy = {
+            fontSize: isHelveticaNeue ? 30 : 28,
+            fontWeight: isHelveticaNeue ? 500 : 800,
+            fontColor: "white",
+            startX: 100,
+            startY: 34,
+            bgPadding: {
+              top: 18,
+              right: 16,
+              bottom: 18,
+              left: 16
+            },
+            bgColor: "black",
+            bgOpacity: 0.5
+          };
 
         // If argument is a button, then get its corresponding input's value. Otherwise, we can pass a string. Not clean, but the best implementation I could think of to keep things DRY.
         if (typeof string == "object") {
@@ -446,16 +602,20 @@ var generate = (function() {
         }
 
         if (string.length > 0) {
+          // Delete old courtesy, if any
           if (saved.courtesy) {
-            exports.clear.canvas(document.getElementById("jsTempCanvas").getContext("2d"));
+            settings.context = document.getElementById("jsTextLayer").getContext("2d");
+            exports.clear.canvas();
+            settings.context = canvas.getContext("2d");
           }
 
           // Draw new courtesy
-          exports.text(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.rectPadding, courtesy.rectColor, courtesy.rectOpacity);
+          exports.text(string, courtesy.fontSize, courtesy.fontWeight, courtesy.fontColor, courtesy.startX, courtesy.startY, courtesy.bgPadding, courtesy.bgColor, courtesy.bgOpacity);
 
           // Save new courtesy message
           saved.courtesy = string;
 
+          // Enable inputs on courtesy template
           if (settings.template == "courtesy") {
             exports.enable.inputs();
           }
@@ -470,9 +630,9 @@ var generate = (function() {
 
         _getImageFile(input, function() {
           if (saved.image.ratio > 1) {
-            exports.clear.canvas(settings.context);
+            exports.clear.canvas();
             _removeImageAdj(button.parentElement);
-            exports.clear.inputs();
+            // exports.clear.inputs();
             exports.image.fit(saved.image);
 
             if (saved.image.ratio != settings.width / settings.height) {
@@ -486,6 +646,123 @@ var generate = (function() {
         });
       },
 
+      noCrop: function(button) {
+        var input = _getButtonInput(button);
+
+        _getImageFile(input, function() {
+          var maxImageHeight = settings.height,
+              newImageWidth = maxImageHeight * saved.image.ratio,
+              startX = (settings.width - newImageWidth) / 2, // Center images
+              startY = 0;
+
+          exports.clear.canvas();
+          // exports.clear.inputs();
+
+          // Use white background for tweets, everything else black
+          if (settings.template == "fs_tweet") {
+            settings.context.fillStyle = "white";
+          } else {
+            settings.context.fillStyle = "black";
+          }
+
+          settings.context.fillRect(0, 0, settings.width, settings.height);
+
+          if (newImageWidth <= settings.width) {
+            settings.context.drawImage(saved.image, startX, startY, newImageWidth, maxImageHeight);
+          } else {
+            // Reverse max limits, set width to 720 and allow flexible height
+            newImageWidth = settings.width;
+            maxImageHeight = newImageWidth / saved.image.ratio; // https://eikhart.com/blog/aspect-ratio-calculator
+            startX = 0;
+            startY = (settings.height - maxImageHeight) / 2;
+
+            console.log("Extreme landscape. newImageWidth: " + newImageWidth + ", maxImageHeight: " + maxImageHeight + ", startX: " + startX + ", startY: " + startY);
+
+            settings.context.drawImage(saved.image, startX, startY, newImageWidth, maxImageHeight);
+          }
+
+          exports.enable.inputs();
+        });
+      },
+
+      l3PhonerImage: function(button) {
+        var input = _getButtonInput(button),
+            startX = 80,
+            startY = 500,
+            phoner = {
+              size: 170,
+              margin: 20
+            };
+
+        _getImageFile(input, function() {
+          if (saved.image.ratio <= 1) {
+            exports.clear.canvas();
+            _removeImageAdj(button.parentElement);
+            // exports.clear.inputs();
+
+            // White border
+            settings.context.strokeStyle = "white";
+            settings.context.lineWidth = 7;
+            settings.context.strokeRect(startX, startY, phoner.size, phoner.size);
+
+            // Cropped foreground image
+            exports.image.fit(saved.image, phoner.size, phoner.size, startX, startY);
+
+            // Square images don't need adjustment. Only present to portrait images.
+            if (saved.image.ratio !== 1) {
+              _createImageAdj(button.parentElement, "Y");
+            }
+
+            // Save phoner dimensions
+            saved.phoner = phoner;
+          } else {
+            alert("This image is LANDSCAPE-oriented. Please submit a different photo.");
+          }
+        });
+      },
+
+      l3PhonerText: function(button) {
+        var inputsArray = button.parentElement.querySelectorAll("input"),
+            blankInputs = _checkBlankInputs(inputsArray),
+            textLayer = document.getElementById("jsTextLayer") || false,
+            startX = (saved.phoner) ? saved.phoner.size + saved.phoner.margin + 80 : 80,
+            startY = 500,
+            bgOpacity = 1,
+            bgPadding = {
+              top: 15,
+              right: 20,
+              bottom: 15,
+              left: 20
+            };
+
+        if (blankInputs > 0) {
+          alert(blankInputs + " text field(s) empty. Please fill them out before submitting.");
+        } else {
+          if (textLayer) {
+            settings.context = textLayer.getContext("2d");
+            exports.clear.canvas();
+            settings.context = canvas.getContext("2d");
+          }
+
+          /*
+          if (document.getElementById("OnthePhone").checked) {
+            exports.text("On the Phone", 33, 800, "white", startX, startY, bgPadding, "black", bgOpacity);
+          } else if (document.getElementById("VoiceOf").checked) {
+            exports.text("Voice of", 33, 800, "white", startX, startY, bgPadding, "black", bgOpacity);
+          }
+          */
+
+          // Draw "On the Phone"
+          exports.text("On the Phone", 33, 800, "white", startX, startY, bgPadding, "black", bgOpacity);
+
+          // Draw rest of text
+          inputsArray.forEach(function(input) {
+            startY += 60;
+            exports.text(input.value, Number(input.dataset.fontSize), Number(input.dataset.fontWeight), "black", startX, startY, bgPadding, "white", bgOpacity);
+          });
+        }
+      },
+
       portrait: function(button) {
         var input = _getButtonInput(button);
 
@@ -494,9 +771,9 @@ var generate = (function() {
               newImageWidth = settings.height * saved.image.ratio;
 
             if (saved.image.ratio <= 1) {
-              exports.clear.canvas(settings.context);
+              exports.clear.canvas();
               _removeImageAdj(button.parentElement);
-              exports.clear.inputs();
+              // exports.clear.inputs();
 
               // Background
               settings.context.fillStyle = "black";
@@ -517,6 +794,33 @@ var generate = (function() {
             } else {
               alert("This image is LANDSCAPE-oriented. Please use the fs_landscape template instead.");
             }
+        });
+      },
+
+      sideBySide: function(button) {
+        var input = _getButtonInput(button),
+            side = button.dataset.fsSide;
+
+        _getImageFile(input, function() {
+          _removeImageAdj(button.parentElement);
+
+          if (side == "left") {
+            exports.image.fit(saved.imageLeft, settings.width / 2, settings.height, 0, 0);
+            _determineImageAdj(saved.imageLeft);
+          } else {
+            exports.image.fit(saved.imageRight, settings.width / 2, settings.height, settings.width / 2, 0);
+            _determineImageAdj(saved.imageRight);
+          }
+
+          if (saved.imageLeft && saved.imageRight) {
+            exports.enable.inputs();
+          }
+
+          function _determineImageAdj(image) {
+            var axis = (image.ratio < 1) ? "Y" : "X";
+
+            _createImageAdj(button.parentElement, axis, { name: "fs-side", value: side });
+          }
         });
       }
     }

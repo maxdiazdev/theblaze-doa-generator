@@ -11,24 +11,20 @@ html(lang="en")
       
   body
     .nav
-      a.nav__button(href="fs_portrait.html") Erase Changes
+      a.nav__button(href="fs_boxed-ad.html") Erase Changes
       a.nav__button(href="index.html") Back to Templates
     .generator
       header.generator__header
         h1.generator__title Create your graphic
       section.generator__preview
         h2.generator__caption Preview
-        canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template="fs_portrait")
+        canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template="fs_boxed-ad")
       section.generator__controls
         fieldset.generator__fieldset
-          span.generator__directions Upload a portrait-oriented or square photo.
+          span.generator__directions Upload a fullscreen advertisement.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button(type="button" onclick="generate.presets.portrait(this)") Choose Image
-        fieldset.generator__fieldset.generator__fieldset--disabled
-          span.generator__directions Add a courtesy to your graphic. It's optional.
-          input.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here." disabled)
-          button.generator__button(type="button" onclick="generate.presets.courtesy(this)" disabled) Add Courtesy
+          button.generator__button(type="button" onclick="generate.presets.boxedAd(this)") Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Name your file. All files save as .png.
           input.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)

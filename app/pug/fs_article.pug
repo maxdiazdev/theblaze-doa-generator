@@ -10,7 +10,9 @@ html(lang="en")
     link(rel="icon", type="image/png", href="images/favicon.png")
       
   body
-    a.nav__button(href="index.html") Back to Templates
+    .nav
+      a.nav__button(href="fs_article.html") Erase Changes
+      a.nav__button(href="index.html") Back to Templates
     .generator
       header.generator__header
         h1.generator__title Create your graphic
@@ -22,12 +24,12 @@ html(lang="en")
           span.generator__directions Upload an article screenshot that's landscape-oriented.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button(type="button" onclick="generator.article(this)") Choose Image
+          button.generator__button(type="button" onclick="generate.presets.article(this)") Choose Image
         fieldset.generator__fieldset.generator__fieldset--disabled
           span.generator__directions Name your file. All files save as .png.
           input.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
-          button.generator__button(type="button" onclick="generator.download(this)" disabled) Download File
+          button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
   script(src="js/font-detect.js")
   script(src="js/canvas-to-blob.min.js")
   script(src="js/file-saver.min.js")
-  script(src="js/generator.js")
+  script(src="js/generator-new.js")
