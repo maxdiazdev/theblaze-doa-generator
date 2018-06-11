@@ -24,7 +24,7 @@ html(lang="en")
           span.generator__directions Upload a portrait-oriented photo. It's optional.
           input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
           span.generator__input.generator__input--image No file uploaded yet.
-          button.generator__button(type="button" onclick="generator.l3_gradient(this)") Choose Image
+          button.generator__button(type="button" onclick="generate.presets.l3GradientImage(this)") Choose Image
         fieldset.generator__fieldset
           span.generator__directions Drag and re-order, or remove text as needed.
           #jsSortable
@@ -43,11 +43,11 @@ html(lang="en")
               input.generator__input.generator__input--text(type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400")
               span.js-sortable-move
               span.js-sortable-remove
-          button.generator__button(type="button" onclick="generator.l3_gradient(this)") Add Text Group
+          button.generator__button(type="button" onclick="generate.presets.l3GradientText(this)") Add Text Group
         fieldset.generator__fieldset
           span.generator__directions Name your file. All files save as .png.
           input.generator__input.generator__input--text(type="text" placeholder="Type a file name here.")
-          button.generator__button(type="button" onclick="generator.download(this)") Download File
+          button.generator__button(type="button" onclick="generate.download(this)") Download File
   script(src="js/font-detect.js")
   script(src="js/canvas-to-blob.min.js")
   script(src="js/file-saver.min.js")
