@@ -22,7 +22,7 @@
       <section class="generator__controls">
         <fieldset class="generator__fieldset generator__fieldset"><span class="generator__directions">Upload a portrait-oriented photo. It's optional.</span>
           <input type="file" accept=".jpg, .jpeg, .png" style="display: none;"><span class="generator__input generator__input--image">No file uploaded yet.</span>
-          <button class="generator__button" type="button" onclick="generator.l3_gradient(this)">Choose Image</button>
+          <button class="generator__button" type="button" onclick="generate.presets.l3GradientImage(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset"><span class="generator__directions">Drag and re-order, or remove text as needed.</span>
           <div id="jsSortable">
@@ -36,11 +36,11 @@
               <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
             </div>
           </div>
-          <button class="generator__button" type="button" onclick="generator.l3_gradient(this)">Add Text Group</button>
+          <button class="generator__button" type="button" onclick="generate.presets.l3GradientText(this)">Add Text Group</button>
         </fieldset>
         <fieldset class="generator__fieldset"><span class="generator__directions">Name your file. All files save as .png.</span>
           <input class="generator__input generator__input--text" type="text" placeholder="Type a file name here.">
-          <button class="generator__button" type="button" onclick="generator.download(this)">Download File</button>
+          <button class="generator__button" type="button" onclick="generate.download(this)">Download File</button>
         </fieldset>
       </section>
     </div>
