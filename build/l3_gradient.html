@@ -25,16 +25,15 @@
           <button class="generator__button" type="button" onclick="generate.presets.l3GradientImage(this)">Choose Image</button>
         </fieldset>
         <fieldset class="generator__fieldset"><span class="generator__directions">Drag and re-order, or remove text as needed.</span>
-          <div id="jsSortable">
-            <div class="js-sortable-item"><span class="generator__label">Heading</span>
-              <input class="generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="800"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
-            </div>
-            <div class="js-sortable-item"><span class="generator__label">Subheading</span>
-              <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
-            </div>
-            <div class="js-sortable-item"><span class="generator__label">Subheading</span>
-              <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
-            </div>
+          <div id="jsSortable"></div>
+          <div class="js-sortable-item"><span class="generator__label">Heading</span>
+            <input class="generator__input generator__input--text" type="text" placeholder="Type large text here..." data-font-size="50" data-font-weight="800"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
+          </div>
+          <div class="js-sortable-item"><span class="generator__label">Subheading</span>
+            <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
+          </div>
+          <div class="js-sortable-item"><span class="generator__label">Subheading</span>
+            <input class="generator__input generator__input--text" type="text" placeholder="Type small text here..." data-font-size="40" data-font-weight="400"><span class="js-sortable-move"></span><span class="js-sortable-remove"></span>
           </div>
           <button class="generator__button" type="button" onclick="generate.presets.l3GradientText(this)">Add Text Group</button>
         </fieldset>
@@ -44,10 +43,10 @@
         </fieldset>
       </section>
     </div>
+    <script src="js/Sortable.min.js"></script>
+    <script src="js/font-detect.js"></script>
+    <script src="js/canvas-to-blob.min.js"></script>
+    <script src="js/file-saver.min.js"></script>
+    <script src="js/generator.js"></script>
   </body>
-  <script src="js/font-detect.js"></script>
-  <script src="js/canvas-to-blob.min.js"></script>
-  <script src="js/file-saver.min.js"></script>
-  <script src="js/Sortable.min.js"></script>
-  <script src="js/generator.js"></script>
 </html>

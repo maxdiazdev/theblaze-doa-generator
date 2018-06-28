@@ -1,0 +1,25 @@
+extends ../templates/_generator.pug
+
+block data
+    - var pageTitle = "l3_phoner"
+
+block controls
+    fieldset.generator__fieldset.generator__fieldset
+        span.generator__directions Upload a portrait-oriented photo. It's optional.
+        input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
+        span.generator__input.generator__input--image No file uploaded yet.
+        button.generator__button(type="button" onclick="generate.presets.l3PhonerImage(this)") Choose Image
+    fieldset.generator__fieldset
+        span.generator__directions Add phoner's name and their description.
+        span.generator__label Name
+        input.generator__input.generator__input--text(type="text" placeholder="Example: John Smith" data-font-size="43" data-font-weight="800")
+        span.generator__label Description
+        input.generator__input.generator__input--text(type="text" placeholder="Example: Admiral of New England" data-font-size="33" data-font-weight="400")
+        button.generator__button(type="button" onclick="generate.presets.l3PhonerText(this)") Add Text Group
+    fieldset.generator__fieldset
+        span.generator__directions Name your file. All files save as .png.
+        input.generator__input.generator__input--text(type="text" placeholder="Example: L3-PHONER_John-Smith")
+        button.generator__button(type="button" onclick="generate.download(this)") Download File
+
+prepend scripts
+  script(src="js/Sortable.min.js")

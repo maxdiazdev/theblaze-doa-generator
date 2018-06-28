@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        title TheBlaze – Day-of-Air Graphics Generator
+        meta(name="description", content="A client-side application for TV producers that generates on-air screen graphics using HTML5 Canvas.")
+        meta(name="author", content="Max Giron")
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        link(rel="stylesheet", href="css/styles.css")
+        link(rel="icon", type="image/png", href="images/favicon.png")
+
+    body
+        block data
+            - var pageTitle = "default"
+        .nav
+            a.nav__button(href=pageTitle + ".html") Erase Changes
+            a.nav__button(href="index.html") Back to Templates
+        .generator
+            header.generator__header
+                h1.generator__title Create your graphic
+            section.generator__preview
+                h2.generator__caption Preview
+                canvas#jsGeneratorCanvas.generator__canvas(width="1280" height="720" data-template=pageTitle)
+            section.generator__controls
+                block controls
+        block scripts    
+            script(src="js/font-detect.js")
+            script(src="js/canvas-to-blob.min.js")
+            script(src="js/file-saver.min.js")
+            script(src="js/generator.js")
