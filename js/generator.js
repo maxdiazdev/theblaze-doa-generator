@@ -652,7 +652,7 @@ var generate = (function() {
 					saved.courtesy = string;
 
 					// Enable inputs on courtesy template
-					if (settings.template == "courtesy") {
+					if (settings.template == "courtesy-only") {
 						exports.enable.inputs();
 					}
 
