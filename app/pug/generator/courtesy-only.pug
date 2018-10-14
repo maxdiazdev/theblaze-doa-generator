@@ -1,14 +1,14 @@
 extends ../templates/_generator.pug
 
 block data
-    - var pageTitle = "courtesy_only"
+	- var pageTitle = "courtesy-only"
 
 block controls
-    fieldset.generator__fieldset
-        span.generator__directions Add a courtesy to your graphic.
-        input.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here.")
-        button.generator__button(type="button" onclick="generate.presets.courtesy(this)") Add Courtesy
-    fieldset.generator__fieldset.generator__fieldset--disabled
-        span.generator__directions Name your file. All files save as .png.
-        input.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
-        button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
+	fieldset.generator__fieldset
+		span.generator__directions Add a courtesy to your graphic.
+		input.generator__input.generator__input--text(type="text" placeholder="Type a courtesy here.")
+		button.generator__button(type="button" onclick="generate.presets.courtesy(this)") Add Courtesy
+	fieldset.generator__fieldset.generator__fieldset--disabled
+		span.generator__directions Name your file. All files save as .png.
+		input.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
+		button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
