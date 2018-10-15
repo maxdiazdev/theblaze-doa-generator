@@ -489,6 +489,14 @@ var generate = (function() {
 						}
 						break;
 
+						case "asset_4x3":
+							if (axis == "X") {
+								exports.image.fit(saved.image, settings.width, settings.height, 0, 0, value, 0.5);
+							} else {
+								exports.image.fit(saved.image, settings.width, settings.height, 0, 0, 0.5, value);
+							}
+							break;
+
 					default:
 						console.log("Could not find match for settings.template. Make sure it's set on this page.");
 						break;
@@ -679,6 +687,27 @@ var generate = (function() {
 					} else {
 						alert("This image is PORTRAIT-oriented. Please use the fs_portrait template instead.");
 					}
+				});
+			},
+
+			fourByThree: function(button) {
+				var input = _getButtonInput(button);
+
+				_getImageFile(input, function() {
+					console.log(settings.width/settings.height);
+					exports.clear.canvas();
+					_removeImageAdj(button.parentElement);
+					exports.image.fit(saved.image);
+
+					if (saved.image.ratio > (settings.width / settings.height) + 0.05) {
+						_createImageAdj(button.parentElement, "X");
+					}
+
+					if (saved.image.ratio < (settings.width / settings.height) - 0.05) {
+						_createImageAdj(button.parentElement, "Y");
+					}
+
+					exports.enable.inputs();
 				});
 			},
 

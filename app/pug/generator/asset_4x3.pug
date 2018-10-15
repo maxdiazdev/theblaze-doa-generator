@@ -1,0 +1,36 @@
+doctype html
+html(lang="en")
+	head
+		meta(charset="utf-8")
+		title TheBlaze – Day-of-Air Graphics Generator
+		meta(name="description", content="A client-side application for TV producers that generates on-air screen graphics using HTML5 Canvas.")
+		meta(name="author", content="Max Giron")
+		meta(name="viewport", content="width=device-width, initial-scale=1")
+		link(rel="stylesheet", href="css/styles.css")
+		link(rel="icon", type="image/png", href="images/favicon.png")
+
+	body
+		- var pageTitle = "asset_4x3"
+		.nav
+			a.nav__button(href=pageTitle + ".html") Erase Changes
+			a.nav__button(href="index.html") Back to Templates
+		.generator
+			header.generator__header
+				h1.generator__title Create your graphic
+			section.generator__preview.generator__preview--asset-4x3
+				h2.generator__caption Preview
+				canvas#jsGeneratorCanvas.generator__canvas.generator__canvas--asset-4x3(width="1280" height="960" data-template=pageTitle)
+			section.generator__controls
+				fieldset.generator__fieldset
+					span.generator__directions Upload a photo.
+					input(type="file" accept=".jpg, .jpeg, .png" style="display: none")
+					span.generator__input.generator__input--image No file uploaded yet.
+					button.generator__button(type="button" onclick="generate.presets.fourByThree(this)") Choose Image
+				fieldset.generator__fieldset.generator__fieldset--disabled
+					span.generator__directions Name your file. All files save as .png.
+					input.generator__input.generator__input--text(type="text" placeholder="Type a file name here." disabled)
+					button.generator__button(type="button" onclick="generate.download(this)" disabled) Download File
+			script(src="js/font-detect.js")
+			script(src="js/canvas-to-blob.min.js")
+			script(src="js/file-saver.min.js")
+			script(src="js/generator.js")

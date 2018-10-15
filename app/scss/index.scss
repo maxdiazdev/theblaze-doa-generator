@@ -326,6 +326,10 @@ img {
 		height: 300px;
 		padding: 20px 50px;
 		background-color: $theme-black;
+
+		&--asset-4x3 {
+			height: 435px;
+		}
 	}
 
 	&__canvas {
@@ -337,6 +341,10 @@ img {
 
 		&--add-background-image {
 			@include bg-cover-image;
+		}
+
+		&--asset-4x3 {
+			height: 435px;
 		}
 	}
 
